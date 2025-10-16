@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "iPlumb",
-    "slug": "iPlumb",
+    "name": "LaserLine Pro",
+    "slug": "LaserLine Pro",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,21 +10,47 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app needs camera access to provide laser leveling functionality.",
+        "NSMicrophoneUsageDescription": "This app needs microphone access for video recording features."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.READ_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow LaserLine Pro to access your camera to provide laser leveling functionality."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Allow LaserLine Pro to save photos with measurement overlays.",
+          "savePhotosPermission": "Allow LaserLine Pro to save photos with measurement overlays.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ]
+    ]
   }
 }
