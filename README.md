@@ -19,6 +19,7 @@ A modern, cross-platform laser level application built with React Native and Exp
    - Real-time bubble position tracking
    - Visual level indicators
    - Perfect for surface leveling
+   - Level represents horizontal surface, plumb is vertical
 
 3. **Clinometer Mode**
    - Precise angle measurement

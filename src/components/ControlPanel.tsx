@@ -120,31 +120,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
   const createMeasurementOverlay = async (): Promise<string | null> => {
     try {
-      // Get sensor data and settings from component level
-      const { sensorData } = useSensors();
-      const { settings } = useSettings();
-
-      // Create a simple text overlay with measurement data
-      const measurementText = `iLaser Measurement Report
-========================
-Mode: ${mode.toUpperCase()}
-Angle: ${sensorData.angle.toFixed(settings.precision)}°
-Pitch: ${sensorData.pitch.toFixed(settings.precision)}°
-Roll: ${sensorData.roll.toFixed(settings.precision)}°
-Status: ${sensorData.isLevel ? "LEVEL" : "NOT LEVEL"}
-Timestamp: ${new Date().toLocaleString()}
-Units: ${settings.unit}
-Precision: ${settings.precision} decimal places`;
-
-      // For now, we'll create a simple text file as overlay
+      // For now, we'll just return null as overlay creation is not essential
       // In a real implementation, you'd create an actual image overlay
-      const overlayUri =
-        FileSystem.documentDirectory + `overlay_${Date.now()}.txt`;
-      await FileSystem.writeAsStringAsync(overlayUri, measurementText, {
-        encoding: FileSystem.EncodingType.UTF8,
-      });
-
-      return overlayUri;
+      return null;
     } catch (error) {
       console.error("Error creating measurement overlay:", error);
       return null;
@@ -388,35 +366,39 @@ Precision: ${settings.precision} decimal places`;
           )}
         </View>
 
-        {/* Right side controls */}
+        {/* Right side controls - mode specific */}
         <View style={styles.rightControls}>
-          <TouchableOpacity
-            style={styles.controlButton}
-            onPress={() => {
-              if (onFlashModeChange) {
-                const nextMode =
-                  flashMode === "off"
-                    ? "torch"
-                    : flashMode === "torch"
-                    ? "auto"
-                    : "off";
-                onFlashModeChange(nextMode);
-              }
-            }}
-          >
-            <Ionicons
-              name={
-                flashMode === "torch"
-                  ? "flash"
-                  : flashMode === "auto"
-                  ? "flash-outline"
-                  : "flash-off"
-              }
-              size={24}
-              color={flashMode === "off" ? "#666666" : "#FFFFFF"}
-            />
-          </TouchableOpacity>
+          {/* Camera-specific controls (flash) */}
+          {(mode === "laser" || mode === "ruler") && (
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={() => {
+                if (onFlashModeChange) {
+                  const nextMode =
+                    flashMode === "off"
+                      ? "torch"
+                      : flashMode === "torch"
+                      ? "auto"
+                      : "off";
+                  onFlashModeChange(nextMode);
+                }
+              }}
+            >
+              <Ionicons
+                name={
+                  flashMode === "torch"
+                    ? "flash"
+                    : flashMode === "auto"
+                    ? "flash-outline"
+                    : "flash-off"
+                }
+                size={24}
+                color={flashMode === "off" ? "#666666" : "#FFFFFF"}
+              />
+            </TouchableOpacity>
+          )}
 
+          {/* Sound control for all modes */}
           <TouchableOpacity
             style={styles.controlButton}
             onPress={() =>
@@ -430,6 +412,7 @@ Precision: ${settings.precision} decimal places`;
             />
           </TouchableOpacity>
 
+          {/* Settings for all modes */}
           <TouchableOpacity
             style={styles.controlButton}
             onPress={() => setShowSettings(true)}

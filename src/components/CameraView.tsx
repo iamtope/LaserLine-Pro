@@ -64,7 +64,7 @@ export const CameraView = forwardRef<ExpoCameraView, CameraViewProps>(
           style={styles.camera}
           facing={facing}
           autofocus="on"
-          flashMode={flashMode}
+          enableTorch={flashMode === "torch"}
         />
         <AROverlay
           mode={mode}

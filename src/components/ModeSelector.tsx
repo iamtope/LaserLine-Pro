@@ -6,6 +6,7 @@ import { LevelingMode } from "../../App";
 interface ModeSelectorProps {
   currentMode: LevelingMode;
   onModeChange: (mode: LevelingMode) => void;
+  onBackToSelection?: () => void;
 }
 
 const modes: {
@@ -22,33 +23,24 @@ const modes: {
 export const ModeSelector: React.FC<ModeSelectorProps> = ({
   currentMode,
   onModeChange,
+  onBackToSelection,
 }) => {
   return (
     <View style={styles.container}>
-      {modes.map((mode) => (
-        <TouchableOpacity
-          key={mode.key}
-          style={[
-            styles.modeButton,
-            currentMode === mode.key && styles.activeModeButton,
-          ]}
-          onPress={() => onModeChange(mode.key)}
-        >
-          <Ionicons
-            name={mode.icon}
-            size={24}
-            color={currentMode === mode.key ? "#000" : "#FFFFFF"}
-          />
-          <Text
-            style={[
-              styles.modeLabel,
-              currentMode === mode.key && styles.activeModeLabel,
-            ]}
-          >
-            {mode.label}
-          </Text>
+      {/* Back Button */}
+      {onBackToSelection && (
+        <TouchableOpacity style={styles.backButton} onPress={onBackToSelection}>
+          <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          <Text style={styles.backLabel}>Back</Text>
         </TouchableOpacity>
-      ))}
+      )}
+
+      {/* Current Mode Display */}
+      <View style={styles.currentModeContainer}>
+        <Text style={styles.currentModeLabel}>
+          {modes.find((m) => m.key === currentMode)?.label || currentMode}
+        </Text>
+      </View>
     </View>
   );
 };
@@ -59,28 +51,29 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.7)",
     borderRadius: 25,
     padding: 4,
-    justifyContent: "space-around",
+    alignItems: "center",
   },
-  modeButton: {
-    flex: 1,
+  backButton: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 20,
-    marginHorizontal: 2,
+    marginRight: 12,
   },
-  activeModeButton: {
-    backgroundColor: "#FFFFFF",
-  },
-  modeLabel: {
+  backLabel: {
     color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "600",
     marginLeft: 8,
   },
-  activeModeLabel: {
-    color: "#000",
+  currentModeContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  currentModeLabel: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
