@@ -5,11 +5,21 @@ import React, {
   useState,
   ReactNode,
 } from "react";
-import { Gyroscope, Accelerometer } from "expo-sensors";
+import {
+  DeviceMotion,
+  Accelerometer,
+  Gyroscope,
+  Magnetometer,
+  Barometer,
+  Pedometer,
+} from "expo-sensors";
+import * as Location from "expo-location";
+// Removed audio monitoring (expo-av) as it's not used
 import * as Haptics from "expo-haptics";
 import Quaternion from "quaternion";
 
 export interface SensorData {
+  // Motion Sensors
   gyroscope: {
     x: number;
     y: number;
@@ -20,13 +30,46 @@ export interface SensorData {
     y: number;
     z: number;
   };
+  magnetometer: {
+    x: number;
+    y: number;
+    z: number;
+  };
+
+  // Orientation
   quaternion: {
     w: number;
     x: number;
     y: number;
     z: number;
   };
-  isLevel: boolean;
+  eulerAngles: {
+    pitch: number;
+    roll: number;
+    yaw: number;
+  };
+
+  // Location & Navigation
+  location: {
+    latitude: number;
+    longitude: number;
+    altitude: number;
+    accuracy: number;
+  };
+  heading: number;
+  speed: number;
+
+  // Environmental
+  barometer: {
+    pressure: number;
+    relativeAltitude: number;
+  };
+  ambientSound: {
+    level: number;
+    decibels: number;
+  };
+
+  // Legacy compatibility
   angle: number;
   pitch: number;
   roll: number;
@@ -55,10 +98,25 @@ interface SensorProviderProps {
 
 export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
   const [sensorData, setSensorData] = useState<SensorData>({
+    // Motion Sensors
     gyroscope: { x: 0, y: 0, z: 0 },
     accelerometer: { x: 0, y: 0, z: 0 },
+    magnetometer: { x: 0, y: 0, z: 0 },
+
+    // Orientation
     quaternion: { w: 1, x: 0, y: 0, z: 0 },
-    isLevel: false,
+    eulerAngles: { pitch: 0, roll: 0, yaw: 0 },
+
+    // Location & Navigation
+    location: { latitude: 0, longitude: 0, altitude: 0, accuracy: 0 },
+    heading: 0,
+    speed: 0,
+
+    // Environmental
+    barometer: { pressure: 0, relativeAltitude: 0 },
+    ambientSound: { level: 0, decibels: 0 },
+
+    // Legacy compatibility
     angle: 0,
     pitch: 0,
     roll: 0,
@@ -72,6 +130,11 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
   const [isCalibrated, setIsCalibrated] = useState(false);
   const [calibrationOffset, setCalibrationOffset] = useState({
     quaternion: new Quaternion(1, 0, 0, 0),
+  });
+
+  // Permission state tracking to prevent multiple requests
+  const [permissionsRequested, setPermissionsRequested] = useState({
+    location: false,
   });
 
   // Smoothing factor for reducing shakiness (0.1 = more smoothing, 1.0 = no smoothing)
@@ -143,7 +206,7 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
     };
   };
 
-  // Orientation-aware gravity-based calibration (handles all phone orientations)
+  // Simplified gravity-based angle calculation
   const getOrientationAwareAngles = (accelData: any) => {
     const { x: gravityX, y: gravityY, z: gravityZ } = accelData;
 
@@ -157,15 +220,14 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
     const normalizedY = gravityY / gravityMagnitude;
     const normalizedZ = gravityZ / gravityMagnitude;
 
-    // Determine phone orientation based on gravity vector
-    // This ensures X and Y are always correct regardless of phone orientation
+    // Simple, consistent angle calculation
+    // Roll: Left/Right tilt (rotation around X-axis)
+    // Pitch: Forward/Backward tilt (rotation around Y-axis)
 
-    // For spirit level, we want:
-    // X-axis: Left/Right tilt (roll)
-    // Y-axis: Forward/Backward tilt (pitch)
+    // Use standard aerospace convention:
+    // Roll = rotation around X-axis (left/right tilt)
+    // Pitch = rotation around Y-axis (forward/backward tilt)
 
-    // Calculate angles based on gravity components
-    // These calculations work regardless of phone orientation
     const roll = Math.atan2(normalizedY, normalizedZ) * (180 / Math.PI);
     const pitch =
       Math.atan2(
@@ -174,58 +236,30 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
       ) *
       (180 / Math.PI);
 
-    // Apply orientation correction based on device orientation
-    // This ensures consistent X/Y mapping
-    let correctedRoll = roll;
-    let correctedPitch = pitch;
-
-    // More sophisticated orientation detection
-    // Determine orientation based on which axis has the strongest gravity component
-    const absX = Math.abs(normalizedX);
-    const absY = Math.abs(normalizedY);
-    const absZ = Math.abs(normalizedZ);
-
-    // Find the dominant axis (the one closest to 1.0 or -1.0)
-    const maxAbs = Math.max(absX, absY, absZ);
-
-    if (maxAbs === absZ) {
-      // Phone is in portrait orientation (normal or upside-down)
-      // No swap needed - X and Y are correct
-      console.log("Portrait orientation detected - no swap needed");
-    } else if (maxAbs === absX) {
-      // Phone is rotated 90 degrees (landscape left or right)
-      // Need to swap X and Y axes
-      correctedRoll = pitch;
-      correctedPitch = roll;
-      console.log("Landscape orientation detected - X/Y swapped");
-    } else if (maxAbs === absY) {
-      // Phone is rotated 90 degrees (landscape left or right)
-      // Need to swap X and Y axes
-      correctedRoll = pitch;
-      correctedPitch = roll;
-      console.log("Landscape orientation detected - X/Y swapped");
-    }
+    // No axis swapping - keep it simple and consistent
+    const correctedRoll = roll;
+    const correctedPitch = pitch;
 
     // Debug logging for orientation detection
-    console.log("Orientation debug:", {
-      normalizedX: normalizedX.toFixed(2),
-      normalizedY: normalizedY.toFixed(2),
-      normalizedZ: normalizedZ.toFixed(2),
-      absX: absX.toFixed(2),
-      absY: absY.toFixed(2),
-      absZ: absZ.toFixed(2),
-      dominantAxis:
-        maxAbs === absZ
-          ? "Z (Portrait)"
-          : maxAbs === absX
-          ? "X (Landscape)"
-          : "Y (Landscape)",
-      originalRoll: roll.toFixed(1),
-      originalPitch: pitch.toFixed(1),
-      correctedRoll: correctedRoll.toFixed(1),
-      correctedPitch: correctedPitch.toFixed(1),
-      swapped: correctedRoll !== roll,
-    });
+    // console.log("Orientation debug:", {
+    //   normalizedX: normalizedX.toFixed(2),
+    //   normalizedY: normalizedY.toFixed(2),
+    //   normalizedZ: normalizedZ.toFixed(2),
+    //   absX: absX.toFixed(2),
+    //   absY: absY.toFixed(2),
+    //   absZ: absZ.toFixed(2),
+    //   dominantAxis:
+    //     maxAbs === absZ
+    //       ? "Z (Portrait)"
+    //       : maxAbs === absX
+    //       ? "X (Landscape)"
+    //       : "Y (Landscape)",
+    //   originalRoll: roll.toFixed(1),
+    //   originalPitch: pitch.toFixed(1),
+    //   correctedRoll: correctedRoll.toFixed(1),
+    //   correctedPitch: correctedPitch.toFixed(1),
+    //   swapped: correctedRoll !== roll,
+    // });
 
     return {
       pitch: correctedPitch,
@@ -234,6 +268,7 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
     };
   };
 
+  // Sensor setup effect - runs once and handles all sensor subscriptions
   useEffect(() => {
     // Set update intervals
     Gyroscope.setUpdateInterval(16); // ~60fps
@@ -303,44 +338,45 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
             // Use orientation-aware calibration (handles all phone orientations)
             const euler = getOrientationAwareAngles(accelData);
 
+            // Normalize angles to fix coordinate system issues
+            // Convert angles like -179.7° to 0.3° for proper level detection
+            const normalizeAngle = (angle: number) => {
+              if (angle > 90) return angle - 180;
+              if (angle < -90) return angle + 180;
+              return angle;
+            };
+
+            const normalizedPitch = normalizeAngle(euler.pitch);
+            const normalizedRoll = normalizeAngle(euler.roll);
+
             // Apply exponential smoothing for different components
             const smoothedPitch =
               sensorData.pitch +
-              (euler.pitch - sensorData.pitch) * smoothingFactor;
+              (normalizedPitch - sensorData.pitch) * smoothingFactor;
             const smoothedRoll =
               sensorData.roll +
-              (euler.roll - sensorData.roll) * smoothingFactor;
+              (normalizedRoll - sensorData.roll) * smoothingFactor;
 
             // Apply extra smoothing for bubble movement (more stable)
             const bubbleSmoothedPitch =
               sensorData.pitch +
-              (euler.pitch - sensorData.pitch) * bubbleSmoothingFactor;
+              (normalizedPitch - sensorData.pitch) * bubbleSmoothingFactor;
             const bubbleSmoothedRoll =
               sensorData.roll +
-              (euler.roll - sensorData.roll) * bubbleSmoothingFactor;
+              (normalizedRoll - sensorData.roll) * bubbleSmoothingFactor;
 
             // Apply smoothing for laser line (balanced)
             const laserSmoothedPitch =
               sensorData.pitch +
-              (euler.pitch - sensorData.pitch) * laserSmoothingFactor;
+              (normalizedPitch - sensorData.pitch) * laserSmoothingFactor;
             const laserSmoothedRoll =
               sensorData.roll +
-              (euler.roll - sensorData.roll) * laserSmoothingFactor;
+              (normalizedRoll - sensorData.roll) * laserSmoothingFactor;
 
             // Calculate total angle deviation
             const angle = Math.sqrt(
               smoothedPitch * smoothedPitch + smoothedRoll * smoothedRoll
             );
-
-            // Determine if level (within 0.5 degrees)
-            const isLevel = angle < 0.5;
-
-            // Check for level state change for haptic feedback
-            if (isLevel && !sensorData.isLevel) {
-              Haptics.notificationAsync(
-                Haptics.NotificationFeedbackType.Success
-              );
-            }
 
             setSensorData((prev) => ({
               ...prev,
@@ -352,10 +388,14 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
                 y: updated.y,
                 z: updated.z,
               },
+              eulerAngles: {
+                pitch: smoothedPitch,
+                roll: smoothedRoll,
+                yaw: prev.eulerAngles.yaw,
+              },
               pitch: smoothedPitch,
               roll: smoothedRoll,
               angle,
-              isLevel,
               // Smoothed values for UI components
               bubblePitch: bubbleSmoothedPitch,
               bubbleRoll: bubbleSmoothedRoll,
@@ -369,18 +409,160 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
       }
     });
 
+    // Additional sensor subscriptions
+    const magnetometerSubscription = Magnetometer.addListener(
+      (magnetometerData) => {
+        setSensorData((prev) => ({
+          ...prev,
+          magnetometer: magnetometerData,
+        }));
+      }
+    );
+
+    // Check if barometer is available and set up subscription
+    let barometerSubscription: any = null;
+    (async () => {
+      try {
+        const isAvailable = await Barometer.isAvailableAsync();
+        if (isAvailable) {
+          barometerSubscription = Barometer.addListener((barometerData) => {
+            console.log("Barometer data:", barometerData);
+            setSensorData((prev) => ({
+              ...prev,
+              barometer: {
+                pressure: barometerData.pressure,
+                relativeAltitude: barometerData.relativeAltitude || 0,
+              },
+            }));
+          });
+        } else {
+          console.log("Barometer not available on this device");
+        }
+      } catch (error) {
+        console.log("Barometer setup failed:", error);
+      }
+    })();
+
     return () => {
       gyroscopeSubscription?.remove();
       accelerometerSubscription?.remove();
+      magnetometerSubscription?.remove();
+      barometerSubscription?.remove();
     };
   }, [
     calibrationOffset,
     lastTimestamp,
     sensorData.pitch,
     sensorData.roll,
-    sensorData.isLevel,
     smoothingFactor,
   ]);
+
+  // Permissions effect - runs once and handles all permission requests (location only)
+  useEffect(() => {
+    // Location services with permission handling
+    let locationSubscription: any = null;
+    (async () => {
+      try {
+        // Check current permission status
+        const { status } = await Location.getForegroundPermissionsAsync();
+
+        if (status === "granted") {
+          // Permission already granted, set up location tracking
+          locationSubscription = await Location.watchPositionAsync(
+            {
+              accuracy: Location.Accuracy.High,
+              timeInterval: 5000,
+              distanceInterval: 5,
+            },
+            (location) => {
+              console.log("Location updated:", location.coords);
+              setSensorData((prev) => ({
+                ...prev,
+                location: {
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
+                  altitude: location.coords.altitude || 0,
+                  accuracy: location.coords.accuracy || 0,
+                },
+                heading: location.coords.heading || 0,
+                speed: location.coords.speed || 0,
+              }));
+            }
+          );
+        } else if (!permissionsRequested.location) {
+          // Request permission only once
+          setPermissionsRequested((prev) => ({ ...prev, location: true }));
+          const { status: newStatus } =
+            await Location.requestForegroundPermissionsAsync();
+          if (newStatus === "granted") {
+            locationSubscription = await Location.watchPositionAsync(
+              {
+                accuracy: Location.Accuracy.High,
+                timeInterval: 5000,
+                distanceInterval: 5,
+              },
+              (location) => {
+                console.log("Location updated:", location.coords);
+                setSensorData((prev) => ({
+                  ...prev,
+                  location: {
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                    altitude: location.coords.altitude || 0,
+                    accuracy: location.coords.accuracy || 0,
+                  },
+                  heading: location.coords.heading || 0,
+                  speed: location.coords.speed || 0,
+                }));
+              }
+            );
+          } else {
+            // Permission denied, set default values
+            setSensorData((prev) => ({
+              ...prev,
+              location: {
+                latitude: 0,
+                longitude: 0,
+                altitude: 0,
+                accuracy: 0,
+              },
+              heading: 0,
+              speed: 0,
+            }));
+          }
+        } else {
+          // Permission was requested before but denied, set default values
+          setSensorData((prev) => ({
+            ...prev,
+            location: {
+              latitude: 0,
+              longitude: 0,
+              altitude: 0,
+              accuracy: 0,
+            },
+            heading: 0,
+            speed: 0,
+          }));
+        }
+      } catch (error) {
+        setSensorData((prev) => ({
+          ...prev,
+          location: {
+            latitude: 0,
+            longitude: 0,
+            altitude: 0,
+            accuracy: 0,
+          },
+          heading: 0,
+          speed: 0,
+        }));
+      }
+    })();
+
+    return () => {
+      locationSubscription?.remove();
+    };
+  }, [permissionsRequested.location]);
 
   // Auto-calibration is always active (like laser levels)
   const calibrate = () => {

@@ -1,107 +1,134 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+import { StyleSheet, View, SafeAreaView, ActivityIndicator, Text, Dimensions } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, SafeAreaView, Dimensions } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+import * as Font from "expo-font";
+import { Ionicons } from "@expo/vector-icons";
+
 import { CameraView } from "./src/components/CameraView";
 import { ControlPanel } from "./src/components/ControlPanel";
 import { MeasurementDisplay } from "./src/components/MeasurementDisplay";
 import { ModeSelector } from "./src/components/ModeSelector";
 import { ModeSelectionScreen } from "./src/components/ModeSelectionScreen";
 import { AROverlay } from "./src/components/AROverlay";
+import { SensorDashboard } from "./src/components/SensorDashboard";
+import { PremiumModal } from "./src/components/PremiumModal";
+
 import { SensorProvider, useSensors } from "./src/context/SensorContext";
 import { SettingsProvider, useSettings } from "./src/context/SettingsContext";
 import { RulerProvider } from "./src/context/RulerContext";
 
-const { width, height } = Dimensions.get("window");
+const { height } = Dimensions.get("window");
 
-export type LevelingMode = "laser" | "spirit" | "clinometer" | "ruler";
+export type LevelingMode = "laser" | "spirit" | "dashboard";
 
-// Main app content component that can use hooks
+// Prevent the splash screen from auto-hiding while we load fonts
+SplashScreen.preventAutoHideAsync();
+
 const MainAppContent: React.FC<{
   currentMode: LevelingMode;
   setCurrentMode: (mode: LevelingMode) => void;
   handleBackToSelection: () => void;
 }> = ({ currentMode, setCurrentMode, handleBackToSelection }) => {
   const [isCalibrating, setIsCalibrating] = useState(false);
-  const [flashMode, setFlashMode] = useState<"on" | "off" | "auto" | "torch">(
-    "off"
-  );
+  const [flashMode, setFlashMode] = useState<"on" | "off" | "auto" | "torch">("off");
+  const [showCoffeeModal, setShowCoffeeModal] = useState(false);
   const cameraRef = useRef<any>(null);
 
   const { sensorData } = useSensors();
   const { settings } = useSettings();
 
-  // Determine if current mode requires camera
-  const requiresCamera = currentMode === "laser" || currentMode === "ruler";
+  const requiresCamera = currentMode === "laser";
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar style="light" backgroundColor="#000" />
 
-      {/* Camera View with AR Overlay - only for modes that need it */}
-      {requiresCamera && (
+      {requiresCamera ? (
         <CameraView
           mode={currentMode}
           isCalibrating={isCalibrating}
           flashMode={flashMode}
           ref={cameraRef}
         />
-      )}
-
-      {/* Professional Background for non-camera modes */}
-      {!requiresCamera && (
+      ) : (
         <View style={styles.professionalBackground}>
           <View style={styles.professionalOverlay} />
-          {/* Render overlay directly for non-camera modes */}
-          <AROverlay
-            mode={currentMode}
-            sensorData={sensorData}
-            settings={settings}
-            isCalibrating={isCalibrating}
-            onToggleCamera={() => {}}
-          />
+          {currentMode === "dashboard" ? (
+            <SensorDashboard />
+          ) : (
+            <AROverlay
+              mode={currentMode}
+              sensorData={sensorData}
+              settings={settings}
+              isCalibrating={isCalibrating}
+              onToggleCamera={() => {}}
+            />
+          )}
         </View>
       )}
 
-      {/* Top Controls */}
       <View style={styles.topControls}>
         <ModeSelector
           currentMode={currentMode}
           onModeChange={setCurrentMode}
           onBackToSelection={handleBackToSelection}
+          onCoffeePress={() => setShowCoffeeModal(true)}
         />
       </View>
 
-      {/* Measurement Display */}
-      <MeasurementDisplay
-        mode={currentMode}
-        style={styles.measurementDisplay}
-      />
+      {currentMode !== "dashboard" && (
+        <MeasurementDisplay mode={currentMode} style={styles.measurementDisplay} />
+      )}
 
-      {/* Bottom Control Panel */}
-      <ControlPanel
-        mode={currentMode}
-        isCalibrating={isCalibrating}
-        onCalibrationToggle={setIsCalibrating}
-        cameraRef={cameraRef}
-        flashMode={flashMode}
-        onFlashModeChange={setFlashMode}
-      />
+      {currentMode === "laser" && (
+        <ControlPanel
+          mode={currentMode}
+          isCalibrating={isCalibrating}
+          onCalibrationToggle={setIsCalibrating}
+          cameraRef={cameraRef}
+          flashMode={flashMode}
+          onFlashModeChange={setFlashMode}
+          onCoffeePress={() => setShowCoffeeModal(true)}
+        />
+      )}
+
+      <PremiumModal visible={showCoffeeModal} onClose={() => setShowCoffeeModal(false)} />
     </SafeAreaView>
   );
 };
 
 export default function App() {
+  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [currentMode, setCurrentMode] = useState<LevelingMode | null>(null);
 
-  const handleModeSelect = (mode: LevelingMode) => {
-    setCurrentMode(mode);
-  };
+  // ✅ Load fonts using Expo’s built-in loader (no manual .ttf paths)
+  React.useEffect(() => {
+    const loadResources = async () => {
+      try {
+        await Font.loadAsync(Ionicons.font);
+      } catch (e) {
+        console.warn("Font load failed, continuing anyway:", e);
+      } finally {
+        setFontsLoaded(true);
+        await SplashScreen.hideAsync();
+      }
+    };
+    loadResources();
+  }, []);
 
-  const handleBackToSelection = () => {
-    setCurrentMode(null);
-  };
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#fff" />
+        <Text style={styles.loadingText}>Loading resources...</Text>
+      </View>
+    );
+  }
 
-  // Show mode selection screen if no mode is selected
+  const handleModeSelect = (mode: LevelingMode) => setCurrentMode(mode);
+  const handleBackToSelection = () => setCurrentMode(null);
+
   if (currentMode === null) {
     return (
       <SettingsProvider>
@@ -130,10 +157,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#000",
-  },
+  container: { flex: 1, backgroundColor: "#000" },
   professionalBackground: {
     flex: 1,
     backgroundColor: "#1A1A1A",
@@ -165,5 +189,16 @@ const styles = StyleSheet.create({
     top: height * 0.15,
     right: 20,
     zIndex: 10,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#000",
+  },
+  loadingText: {
+    color: "#fff",
+    fontSize: 16,
+    marginTop: 10,
   },
 });

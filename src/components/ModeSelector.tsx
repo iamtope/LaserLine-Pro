@@ -1,12 +1,14 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LevelingMode } from "../../App";
 
 interface ModeSelectorProps {
   currentMode: LevelingMode;
   onModeChange: (mode: LevelingMode) => void;
   onBackToSelection?: () => void;
+  onCoffeePress?: () => void;
 }
 
 const modes: {
@@ -16,14 +18,14 @@ const modes: {
 }[] = [
   { key: "laser", label: "Laser", icon: "scan" },
   { key: "spirit", label: "Spirit", icon: "radio-button-off" },
-  { key: "clinometer", label: "Clinometer", icon: "triangle" },
-  { key: "ruler", label: "Ruler", icon: "resize" },
+  { key: "dashboard", label: "Dashboard", icon: "analytics" },
 ];
 
 export const ModeSelector: React.FC<ModeSelectorProps> = ({
   currentMode,
   onModeChange,
   onBackToSelection,
+  onCoffeePress,
 }) => {
   return (
     <View style={styles.container}>
@@ -41,6 +43,13 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
           {modes.find((m) => m.key === currentMode)?.label || currentMode}
         </Text>
       </View>
+
+      {/* Coffee Button - Top Right */}
+      {onCoffeePress && (
+        <TouchableOpacity style={styles.coffeeButton} onPress={onCoffeePress}>
+          <FontAwesome name="coffee" size={24} color="black" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -68,6 +77,7 @@ const styles = StyleSheet.create({
   },
   currentModeContainer: {
     flex: 1,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -75,5 +85,25 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
+    marginRight: 8,
+  },
+  coffeeButton: {
+    backgroundColor: "#FF6B35",
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
   },
 });

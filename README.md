@@ -1,4 +1,4 @@
-# LaserLine Pro - Professional Laser Level App
+# Laserline Pro - Professional Laser Level App
 
 A modern, cross-platform laser level application built with React Native and Expo, featuring advanced AR overlays and precise measurement capabilities.
 
@@ -87,7 +87,7 @@ A modern, cross-platform laser level application built with React Native and Exp
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd LaserLine Pro
+cd Laserline Pro
 
 # Install dependencies
 npm install
@@ -185,3 +185,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Inspired by professional laser level tools
 - Built with React Native and Expo
 - Uses native device sensors for accuracy
+
+iOS
+//app Id - ca-app-pub-6244419407881612~6898094220
+//ad unit ID - ca-app-pub-6244419407881612/3652257433
+
+Android
+app Id - ca-app-pub-6244419407881612~4333756041
+ad unit ID - ca-app-pub-6244419407881612/9091258706

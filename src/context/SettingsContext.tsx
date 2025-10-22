@@ -17,7 +17,7 @@ export interface AppSettings {
   vibrationEnabled: boolean;
   orientationLocked: boolean;
   gridEnabled: boolean;
-  laserLinesCount: number;
+  LaserlinesCount: number;
   autoCapture: boolean;
 }
 
@@ -41,7 +41,7 @@ const defaultSettings: AppSettings = {
   vibrationEnabled: true,
   orientationLocked: false,
   gridEnabled: true,
-  laserLinesCount: 3,
+  LaserlinesCount: 3,
   autoCapture: false,
 };
 
