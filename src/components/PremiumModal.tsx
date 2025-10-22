@@ -24,36 +24,24 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
 }) => {
   const handleBuyCoffee = async () => {
     try {
-      // You can replace this with your actual Ko-fi, PayPal, or other donation link
       const coffeeUrl = "https://ko-fi.com/iamtope"; // Replace with your actual Ko-fi, PayPal, or other donation link
       const supported = await Linking.canOpenURL(coffeeUrl);
       if (supported) {
         await Linking.openURL(coffeeUrl);
       }
     } catch (error) {
-      console.log("Error opening coffee link:", error);
     }
     onClose();
   };
 
   const features = [
     {
-      icon: "heart-outline",
-      title: "Support Development",
-      description: "Help keep this app free and improve it",
-    },
-    {
-      icon: "cafe-outline",
+      icon: "cafe",
       title: "Buy Me Coffee",
       description: "Fuel my coding sessions with caffeine",
     },
     {
-      icon: "star-outline",
-      title: "Show Appreciation",
-      description: "Let me know you find this app useful",
-    },
-    {
-      icon: "rocket-outline",
+      icon: "rocket",
       title: "Enable Future Updates",
       description: "Help fund new features and improvements",
     },
@@ -71,11 +59,11 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerContent}>
-              <Ionicons name="cafe-outline" size={32} color="#FF6B35" />
+              <Ionicons name="cafe" size={32} color="#FF6B35" />
               <View style={styles.titleRow}>
                 <Text style={styles.title}>Buy Me Coffee</Text>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                  <Ionicons name="close-outline" size={20} color="#FFF" />
+                  <Ionicons name="close" size={20} color="#FFF" />
                 </TouchableOpacity>
               </View>
               <Text style={styles.subtitle}>
@@ -90,17 +78,48 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
             showsVerticalScrollIndicator={false}
           >
             {features.map((feature, index) => (
-              <View key={index} style={styles.featureItem}>
-                <View style={styles.featureIcon}>
+              <View
+                key={index}
+                style={[
+                  styles.featureItem,
+                  feature.title === "Support Development" &&
+                    styles.highlightedFeature,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.featureIcon,
+                    feature.title === "Support Development" &&
+                      styles.highlightedIcon,
+                  ]}
+                >
                   <Ionicons
                     name={feature.icon as any}
                     size={24}
-                    color="#FF6B35"
+                    color={
+                      feature.title === "Support Development"
+                        ? "#FFF"
+                        : "#FF6B35"
+                    }
                   />
                 </View>
                 <View style={styles.featureContent}>
-                  <Text style={styles.featureTitle}>{feature.title}</Text>
-                  <Text style={styles.featureDescription}>
+                  <Text
+                    style={[
+                      styles.featureTitle,
+                      feature.title === "Support Development" &&
+                        styles.highlightedTitle,
+                    ]}
+                  >
+                    {feature.title}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.featureDescription,
+                      feature.title === "Support Development" &&
+                        styles.highlightedDescription,
+                    ]}
+                  >
                     {feature.description}
                   </Text>
                 </View>
@@ -125,12 +144,12 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
               style={styles.purchaseButton}
               onPress={handleBuyCoffee}
             >
-              <Ionicons name="cafe-outline" size={20} color="#FFF" />
+              <Ionicons name="cafe" size={20} color="#FFF" />
               <Text style={styles.purchaseButtonText}>Buy Me Coffee</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.restoreButton} onPress={onClose}>
-              <Ionicons name="heart-outline" size={16} color="#FF6B35" />
+              <Ionicons name="heart" size={16} color="#FF6B35" />
               <Text style={styles.restoreButtonText}>Maybe Later</Text>
             </TouchableOpacity>
           </View>
@@ -153,7 +172,7 @@ const styles = StyleSheet.create({
   container: {
     width: width * 0.9,
     maxWidth: 400,
-    maxHeight: height * 0.6,
+    height: 600,
     backgroundColor: "#1A1A1A",
     borderRadius: 16,
     overflow: "hidden",
@@ -195,12 +214,12 @@ const styles = StyleSheet.create({
   featuresContainer: {
     flex: 1,
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   featureItem: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 4,
   },
   featureIcon: {
     width: 48,
@@ -225,9 +244,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     lineHeight: 20,
   },
+  highlightedFeature: {
+    backgroundColor: "rgba(255, 107, 53, 0.1)",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 107, 53, 0.3)",
+  },
+  highlightedIcon: {
+    backgroundColor: "#FF6B35",
+  },
+  highlightedTitle: {
+    color: "#FF6B35",
+    fontWeight: "bold",
+  },
+  highlightedDescription: {
+    color: "#FFF",
+    fontWeight: "500",
+  },
   pricingContainer: {
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingVertical: 12,
     backgroundColor: "#2A2A2A",
   },
   priceBox: {
@@ -282,14 +320,14 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     paddingHorizontal: 24,
-    paddingTop: 5,
-    paddingBottom: 6,
+    paddingTop: 16,
+    paddingBottom: 12,
     gap: 12,
   },
   footer: {
     paddingHorizontal: 24,
-    paddingTop: 16,
-    paddingBottom: 24,
+    paddingTop: 8,
+    paddingBottom: 16,
     alignItems: "center",
   },
   footerText: {

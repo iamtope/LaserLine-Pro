@@ -38,12 +38,7 @@ export const MeasurementDisplay: React.FC<MeasurementDisplayProps> = ({
     <View style={styles.measurementContainer}>
       <View style={styles.measurementRow}>
         <Text style={styles.measurementLabel}>Angle:</Text>
-        <Text
-          style={[
-            styles.measurementValue,
-            { color: sensorData.isLevel ? "#00FF00" : "#FF0000" },
-          ]}
-        >
+        <Text style={styles.measurementValue}>
           {formatValue(sensorData.angle)}
         </Text>
       </View>
@@ -72,6 +67,11 @@ export const MeasurementDisplay: React.FC<MeasurementDisplayProps> = ({
         return null;
     }
   };
+
+  // Don't render anything for spirit mode
+  if (mode === "spirit") {
+    return null;
+  }
 
   return <View style={[styles.container, style]}>{renderMeasurements()}</View>;
 };

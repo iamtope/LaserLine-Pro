@@ -52,36 +52,18 @@ export const RulerProvider: React.FC<RulerProviderProps> = ({ children }) => {
   const [calibrationFactor, setCalibrationFactor] = useState<number>(0); // Start with 0 to force default calculation
   const [isCalibrated, setIsCalibrated] = useState<boolean>(false);
 
-  // Get actual screen dimensions
   const screenDimensions = Dimensions.get("window");
   const screenWidth = screenDimensions.width;
   const screenHeight = screenDimensions.height;
 
-  // Default calibration based on screen dimensions and camera characteristics
-  // This provides a baseline that users can calibrate for their specific setup
   const defaultCalibrationFactor = () => {
-    // Use screen dimensions to estimate pixels per cm
-    // This is a rough estimate that users should calibrate with a known object
 
-    // Most phones have similar pixel density ratios
-    // We'll use a conservative estimate that users can fine-tune
     const estimatedPixelsPerCm = screenWidth / 8; // Assume 8cm phone width
 
-    console.log(
-      `Default calibration: ${screenWidth}px screen width, estimated ${estimatedPixelsPerCm} pixels/cm`
-    );
     return estimatedPixelsPerCm;
   };
 
   const addPoint = (x: number, y: number) => {
-    console.log(
-      "addPoint called with:",
-      x,
-      y,
-      "currentPoints:",
-      currentPoints.length
-    );
-
     const newPoint: MeasurementPoint = {
       x,
       y,
@@ -89,13 +71,9 @@ export const RulerProvider: React.FC<RulerProviderProps> = ({ children }) => {
     };
 
     if (currentPoints.length === 0) {
-      // First point
-      console.log("Adding first point");
       setCurrentPoints([newPoint]);
       setIsMeasuring(true);
     } else if (currentPoints.length === 1) {
-      // Second point - complete measurement
-      console.log("Adding second point, completing measurement");
       const startPoint = currentPoints[0];
       const distance = calculateDistance(startPoint, newPoint);
 
@@ -123,20 +101,15 @@ export const RulerProvider: React.FC<RulerProviderProps> = ({ children }) => {
     point1: MeasurementPoint,
     point2: MeasurementPoint
   ): number => {
-    // Calculate pixel distance
     const pixelDistance = Math.sqrt(
       Math.pow(point2.x - point1.x, 2) + Math.pow(point2.y - point1.y, 2)
     );
 
-    // Use calibration factor to convert pixels to real-world distance
-    // If no calibration has been done, use default estimation
     const effectiveCalibrationFactor =
       calibrationFactor > 0 ? calibrationFactor : defaultCalibrationFactor();
 
-    // Convert pixels to centimeters using calibration factor
     const distanceInCm = pixelDistance / effectiveCalibrationFactor;
 
-    // Convert to current unit
     switch (currentUnit) {
       case "cm":
         return distanceInCm;
@@ -163,7 +136,6 @@ export const RulerProvider: React.FC<RulerProviderProps> = ({ children }) => {
 
   const setUnit = (unit: "cm" | "m" | "ft" | "in") => {
     setCurrentUnit(unit);
-    // Recalculate all measurements with new unit
     setMeasurements((prev) =>
       prev.map((m) => ({
         ...m,
@@ -174,23 +146,14 @@ export const RulerProvider: React.FC<RulerProviderProps> = ({ children }) => {
   };
 
   const calibrateRuler = (knownDistanceCm: number, pixelDistance: number) => {
-    // Calculate calibration factor: pixels per cm
     const newCalibrationFactor = pixelDistance / knownDistanceCm;
     setCalibrationFactor(newCalibrationFactor);
     setIsCalibrated(true);
-    console.log(
-      `Ruler calibrated: ${pixelDistance} pixels = ${knownDistanceCm}cm`
-    );
-    console.log(`Calibration factor: ${newCalibrationFactor} pixels/cm`);
-    console.log(
-      `Calibration status: ${isCalibrated ? "CALIBRATED" : "NOT CALIBRATED"}`
-    );
   };
 
   const resetCalibration = () => {
     setCalibrationFactor(0);
     setIsCalibrated(false);
-    console.log("Ruler calibration reset");
   };
 
   const value: RulerContextType = {

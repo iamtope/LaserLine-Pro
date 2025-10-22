@@ -79,7 +79,6 @@ export const SensorDashboard: React.FC = () => {
   const [locationPermission, setLocationPermission] = useState(false);
 
   useEffect(() => {
-    // Check existing permissions
     (async () => {
       try {
         const { status } = await Location.getForegroundPermissionsAsync();
@@ -90,13 +89,11 @@ export const SensorDashboard: React.FC = () => {
     })();
   }, []);
 
-  // Format values for display
   const formatValue = (value: number, decimals: number = 2) => {
     return value.toFixed(decimals);
   };
 
   const formatCoordinate = (value: number) => {
-    console.log("Formatting coordinate:", value);
     return value.toFixed(6);
   };
 
@@ -125,7 +122,6 @@ export const SensorDashboard: React.FC = () => {
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
-        // Add padding to account for top navigation
         contentInsetAdjustmentBehavior="automatic"
       >
         {/* Motion Sensors Section */}

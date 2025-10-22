@@ -1,7 +1,6 @@
 import React from "react";
 import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { LevelingMode } from "../../App";
 
 interface ModeSelectorProps {
@@ -16,9 +15,9 @@ const modes: {
   label: string;
   icon: keyof typeof Ionicons.glyphMap;
 }[] = [
-  { key: "laser", label: "Laser", icon: "scan" },
+  { key: "laser", label: "Laser", icon: "scan-outline" },
   { key: "spirit", label: "Spirit", icon: "radio-button-off" },
-  { key: "dashboard", label: "Dashboard", icon: "analytics" },
+  { key: "dashboard", label: "Dashboard", icon: "analytics-outline" },
 ];
 
 export const ModeSelector: React.FC<ModeSelectorProps> = ({
@@ -47,7 +46,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
       {/* Coffee Button - Top Right */}
       {onCoffeePress && (
         <TouchableOpacity style={styles.coffeeButton} onPress={onCoffeePress}>
-          <FontAwesome name="coffee" size={24} color="black" />
+          <Ionicons name="cafe" size={24} color="black" />
         </TouchableOpacity>
       )}
     </View>

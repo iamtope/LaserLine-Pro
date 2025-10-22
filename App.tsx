@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
-import * as Font from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 
 import { CameraView } from "./src/components/CameraView";
@@ -29,7 +28,6 @@ const { height } = Dimensions.get("window");
 
 export type LevelingMode = "laser" | "spirit" | "dashboard";
 
-// Prevent the splash screen from auto-hiding while we load fonts
 SplashScreen.preventAutoHideAsync();
 
 const MainAppContent: React.FC<{
@@ -101,7 +99,6 @@ const MainAppContent: React.FC<{
           cameraRef={cameraRef}
           flashMode={flashMode}
           onFlashModeChange={setFlashMode}
-          onCoffeePress={() => setShowCoffeeModal(true)}
         />
       )}
 
@@ -114,32 +111,11 @@ const MainAppContent: React.FC<{
 };
 
 export default function App() {
-  const [fontsLoaded, setFontsLoaded] = useState(false);
   const [currentMode, setCurrentMode] = useState<LevelingMode | null>(null);
 
-  // ✅ Load fonts using Expo’s built-in loader (no manual .ttf paths)
   React.useEffect(() => {
-    const loadResources = async () => {
-      try {
-        await Font.loadAsync(Ionicons.font);
-      } catch (e) {
-        console.warn("Font load failed, continuing anyway:", e);
-      } finally {
-        setFontsLoaded(true);
-        await SplashScreen.hideAsync();
-      }
-    };
-    loadResources();
+    SplashScreen.hideAsync();
   }, []);
-
-  if (!fontsLoaded) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#fff" />
-        <Text style={styles.loadingText}>Loading resources...</Text>
-      </View>
-    );
-  }
 
   const handleModeSelect = (mode: LevelingMode) => setCurrentMode(mode);
   const handleBackToSelection = () => setCurrentMode(null);

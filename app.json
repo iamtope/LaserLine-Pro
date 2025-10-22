@@ -18,7 +18,10 @@
       "deploymentTarget": "16.0",
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs camera access to provide laser leveling functionality."
-      }
+      },
+      "fonts": [
+        "node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf"
+      ]
     },
     "android": {
       "adaptiveIcon": {

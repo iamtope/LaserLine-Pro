@@ -53,7 +53,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
   const handleCapture = async () => {
     try {
-      // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
         Alert.alert(
@@ -63,15 +62,12 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         return;
       }
 
-      // Capture the camera view with overlay
       const imageUri = await captureCameraWithOverlay();
 
       if (imageUri) {
-        // Save directly to gallery
         await MediaLibrary.saveToLibraryAsync(imageUri);
         Alert.alert("Success", "Photo captured and saved to gallery!");
 
-        // Call the onCapture callback if provided
         if (onCapture) {
           onCapture();
         }
@@ -91,7 +87,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         return null;
       }
 
-      // Capture the camera view as an image
       const imageUri = await cameraRef.current.takePictureAsync({
         quality: 0.8,
         base64: false,
@@ -103,11 +98,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         return null;
       }
 
-      // Create a measurement overlay image
       const overlayUri = await createMeasurementOverlay();
 
       if (overlayUri) {
-        // Combine camera image with measurement overlay
         const finalImageUri = await combineImages(imageUri.uri, overlayUri);
         return finalImageUri;
       }
@@ -121,11 +114,9 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
   const createMeasurementOverlay = async (): Promise<string | null> => {
     try {
-      // Get sensor data and settings from component level
       const { sensorData } = useSensors();
       const { settings } = useSettings();
 
-      // Create a simple text overlay with measurement data
       const measurementText = `iLaser Measurement Report
 ========================
 Mode: ${mode.toUpperCase()}
@@ -137,8 +128,6 @@ Timestamp: ${new Date().toLocaleString()}
 Units: ${settings.unit}
 Precision: ${settings.precision} decimal places`;
 
-      // For now, we'll just return null as overlay creation is not essential
-      // In a real implementation, you'd create an actual image overlay
       return null;
     } catch (error) {
       console.error("Error creating measurement overlay:", error);
@@ -151,9 +140,6 @@ Precision: ${settings.precision} decimal places`;
     overlayUri: string
   ): Promise<string | null> => {
     try {
-      // For now, we'll just return the camera image
-      // In a real implementation, you'd use an image processing library
-      // to overlay the measurement data on the camera image
       return cameraImageUri;
     } catch (error) {
       console.error("Error combining images:", error);
@@ -324,7 +310,7 @@ Precision: ${settings.precision} decimal places`;
           >
             <Ionicons
               name={isCalibrating ? "checkmark" : "refresh"}
-              size={24}
+              size={20}
               color={isCalibrating ? "#000" : "#FFFFFF"}
             />
           </TouchableOpacity>
@@ -333,7 +319,7 @@ Precision: ${settings.precision} decimal places`;
             style={styles.controlButton}
             onPress={handleCapture}
           >
-            <Ionicons name="camera" size={24} color="#FFFFFF" />
+            <Ionicons name="camera" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
@@ -348,7 +334,7 @@ Precision: ${settings.precision} decimal places`;
             >
               <Ionicons
                 name={settings.gridEnabled ? "grid" : "grid-outline"}
-                size={24}
+                size={20}
                 color="#FFFFFF"
               />
             </TouchableOpacity>
@@ -409,7 +395,7 @@ Precision: ${settings.precision} decimal places`;
                   ? "volume-high-outline"
                   : "volume-mute-outline"
               }
-              size={24}
+              size={20}
               color="#FFFFFF"
             />
           </TouchableOpacity>
@@ -418,7 +404,7 @@ Precision: ${settings.precision} decimal places`;
             style={styles.controlButton}
             onPress={() => setShowSettings(true)}
           >
-            <Ionicons name="settings" size={24} color="#FFFFFF" />
+            <Ionicons name="settings" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -436,28 +422,30 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     zIndex: 10,
   },
   leftControls: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   centerControls: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   rightControls: {
     flexDirection: "row",
-    gap: 8,
+    gap: 6,
   },
   controlButton: {
-    backgroundColor: "rgba(252, 252, 252, 0.7)",
-    borderRadius: 25,
-    width: 50,
-    height: 50,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    borderRadius: 22,
+    width: 44,
+    height: 44,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   activeControlButton: {
     backgroundColor: "#FFFFFF",

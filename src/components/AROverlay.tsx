@@ -222,13 +222,6 @@ export const AROverlay: React.FC<AROverlayProps> = ({
     const calibratedPitch = pitch; // Y-axis (forward-backward tilt)
 
     // Debug: Log the raw values to understand the coordinate system
-    console.log("Raw sensor data:", {
-      pitch,
-      roll,
-      calibratedPitch,
-      calibratedRoll,
-      isCalibrated,
-    });
 
     // EXACT colors from the image
     const liquidGreen = "#00FF00"; // Bright neon lime green like in the image
@@ -660,7 +653,6 @@ export const AROverlay: React.FC<AROverlayProps> = ({
           °
         </SvgText>
 
-        {/* Removed spirit mode control icons (AD, gravity, precision, lock) */}
       </Svg>
     );
   };
