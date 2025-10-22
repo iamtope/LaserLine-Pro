@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     color: "#CCC",
     fontSize: 12,
   },
- 
+
   purchaseButton: {
     flexDirection: "row",
     alignItems: "center",

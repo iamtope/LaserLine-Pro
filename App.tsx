@@ -1,5 +1,12 @@
 import React, { useState, useRef } from "react";
-import { StyleSheet, View, SafeAreaView, ActivityIndicator, Text, Dimensions } from "react-native";
+import {
+  StyleSheet,
+  View,
+  SafeAreaView,
+  ActivityIndicator,
+  Text,
+  Dimensions,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import * as SplashScreen from "expo-splash-screen";
 import * as Font from "expo-font";
@@ -31,7 +38,9 @@ const MainAppContent: React.FC<{
   handleBackToSelection: () => void;
 }> = ({ currentMode, setCurrentMode, handleBackToSelection }) => {
   const [isCalibrating, setIsCalibrating] = useState(false);
-  const [flashMode, setFlashMode] = useState<"on" | "off" | "auto" | "torch">("off");
+  const [flashMode, setFlashMode] = useState<"on" | "off" | "auto" | "torch">(
+    "off"
+  );
   const [showCoffeeModal, setShowCoffeeModal] = useState(false);
   const cameraRef = useRef<any>(null);
 
@@ -78,7 +87,10 @@ const MainAppContent: React.FC<{
       </View>
 
       {currentMode !== "dashboard" && (
-        <MeasurementDisplay mode={currentMode} style={styles.measurementDisplay} />
+        <MeasurementDisplay
+          mode={currentMode}
+          style={styles.measurementDisplay}
+        />
       )}
 
       {currentMode === "laser" && (
@@ -93,7 +105,10 @@ const MainAppContent: React.FC<{
         />
       )}
 
-      <PremiumModal visible={showCoffeeModal} onClose={() => setShowCoffeeModal(false)} />
+      <PremiumModal
+        visible={showCoffeeModal}
+        onClose={() => setShowCoffeeModal(false)}
+      />
     </SafeAreaView>
   );
 };
