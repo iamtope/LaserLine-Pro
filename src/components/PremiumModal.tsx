@@ -38,22 +38,22 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
 
   const features = [
     {
-      icon: "heart",
+      icon: "heart-outline",
       title: "Support Development",
       description: "Help keep this app free and improve it",
     },
     {
-      icon: "cafe",
+      icon: "cafe-outline",
       title: "Buy Me Coffee",
       description: "Fuel my coding sessions with caffeine",
     },
     {
-      icon: "star",
+      icon: "star-outline",
       title: "Show Appreciation",
       description: "Let me know you find this app useful",
     },
     {
-      icon: "rocket",
+      icon: "rocket-outline",
       title: "Enable Future Updates",
       description: "Help fund new features and improvements",
     },
@@ -71,11 +71,11 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerContent}>
-              <Ionicons name="cafe" size={32} color="#FF6B35" />
+              <Ionicons name="cafe-outline" size={32} color="#FF6B35" />
               <View style={styles.titleRow}>
                 <Text style={styles.title}>Buy Me Coffee</Text>
                 <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                  <Ionicons name="close" size={20} color="#FFF" />
+                  <Ionicons name="close-outline" size={20} color="#FFF" />
                 </TouchableOpacity>
               </View>
               <Text style={styles.subtitle}>
@@ -125,22 +125,18 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
               style={styles.purchaseButton}
               onPress={handleBuyCoffee}
             >
-              <Ionicons name="cafe" size={20} color="#FFF" />
+              <Ionicons name="cafe-outline" size={20} color="#FFF" />
               <Text style={styles.purchaseButtonText}>Buy Me Coffee</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.restoreButton} onPress={onClose}>
-              <Ionicons name="heart" size={16} color="#FF6B35" />
+              <Ionicons name="heart-outline" size={16} color="#FF6B35" />
               <Text style={styles.restoreButtonText}>Maybe Later</Text>
             </TouchableOpacity>
           </View>
 
           {/* Footer */}
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>
-              Thank you for supporting independent app development! ☕
-            </Text>
-          </View>
+          <View style={styles.footer}></View>
         </View>
       </View>
     </Modal>
@@ -157,7 +153,7 @@ const styles = StyleSheet.create({
   container: {
     width: width * 0.9,
     maxWidth: 400,
-    maxHeight: height * 0.9,
+    maxHeight: height * 0.6,
     backgroundColor: "#1A1A1A",
     borderRadius: 16,
     overflow: "hidden",
@@ -284,9 +280,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 6,
   },
+  buttonContainer: {
+    paddingHorizontal: 24,
+    paddingTop: 5,
+    paddingBottom: 6,
+    gap: 12,
+  },
   footer: {
     paddingHorizontal: 24,
-    paddingBottom: 20,
+    paddingTop: 16,
+    paddingBottom: 24,
     alignItems: "center",
   },
   footerText: {

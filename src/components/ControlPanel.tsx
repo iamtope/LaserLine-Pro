@@ -387,10 +387,10 @@ Precision: ${settings.precision} decimal places`;
             <Ionicons
               name={
                 flashMode === "torch"
-                  ? "flash"
+                  ? "flash-outline"
                   : flashMode === "auto"
                   ? "flash-outline"
-                  : "flash-off"
+                  : "flash-off-outline"
               }
               size={24}
               color={flashMode === "off" ? "#666666" : "#FFFFFF"}
@@ -404,7 +404,11 @@ Precision: ${settings.precision} decimal places`;
             }
           >
             <Ionicons
-              name={settings.soundEnabled ? "volume-high" : "volume-mute"}
+              name={
+                settings.soundEnabled
+                  ? "volume-high-outline"
+                  : "volume-mute-outline"
+              }
               size={24}
               color="#FFFFFF"
             />
@@ -432,20 +436,20 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     zIndex: 10,
   },
   leftControls: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
   },
   centerControls: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
   },
   rightControls: {
     flexDirection: "row",
-    gap: 12,
+    gap: 8,
   },
   controlButton: {
     backgroundColor: "rgba(252, 252, 252, 0.7)",

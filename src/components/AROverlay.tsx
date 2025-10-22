@@ -56,12 +56,30 @@ export const AROverlay: React.FC<AROverlayProps> = ({
     const { pitch, roll, angle } = sensorData;
     const lineOpacity = 0.8;
 
-    // Calculate rotation angle from pitch and roll
-    // Apply calibration offset to align with blue lines when resting on table
-    const calibratedPitch = pitch + 0.8; // Offset for table resting position
-    const calibratedRoll = roll - 0.3; // Offset for table resting position
+    // Professional Laser Level Algorithm
+    // Based on real physics and phone orientation
+
+    // Get the device's orientation angles (in degrees)
+    const pitchDegrees = pitch; // Forward/backward tilt
+    const rollDegrees = roll; // Left/right tilt
+
+    // Convert to radians for calculations
+    const pitchRad = (pitchDegrees * Math.PI) / 180;
+    const rollRad = (rollDegrees * Math.PI) / 180;
+
+    // Calculate the tilt angle from horizontal (0 = perfectly level)
+    // This is the actual angle the phone is tilted from level
+    const tiltAngle = Math.sqrt(pitchRad * pitchRad + rollRad * rollRad);
+
+    // Calculate the direction of tilt (which way the phone is leaning)
+    const tiltDirection = Math.atan2(pitchRad, rollRad);
+
+    // For laser level: the crosshair should rotate to show the tilt direction
+    // The rotation should be proportional to the tilt angle but capped for usability
+    const maxRotationDegrees = 30; // Maximum rotation for visual clarity
     const rotationAngle =
-      Math.atan2(calibratedPitch, calibratedRoll) * (180 / Math.PI);
+      Math.min(tiltAngle * (180 / Math.PI), maxRotationDegrees) *
+      Math.sin(tiltDirection);
 
     // Line length for the rotating cross
     const lineLength = 150;
@@ -449,16 +467,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         />
 
         {/* Level indicator for horizontal */}
-        {Math.abs(sensorData.bubbleRoll) < 0.3 && (
-          <Circle
-            cx={centerX}
-            cy={centerY - 235}
-            r="3"
-            fill="#00FF00"
-            stroke="#FFFFFF"
-            strokeWidth="1"
-          />
-        )}
+        {/* Removed green dot inside horizontal bubble */}
 
         {/* Vertical Level Indicator (Left) - Enhanced */}
         <Rect
@@ -614,32 +623,33 @@ export const AROverlay: React.FC<AROverlayProps> = ({
 
         {/* Angle readings - EXACT positioning from image */}
         {/* Centered vertical stack for X, Y, Dev */}
+        {/* X, Y, Dev values with equal left and right margins */}
         <SvgText
-          x={centerX}
-          y={height - 110}
-          fontSize="18"
+          x={width * 0.15}
+          y={height - 100}
+          fontSize="16"
           fill="#FFFFFF"
-          textAnchor="middle"
+          textAnchor="start"
           fontWeight="bold"
         >
           X: {sensorData.bubbleRoll.toFixed(1)}°
         </SvgText>
         <SvgText
-          x={centerX}
-          y={height - 88}
-          fontSize="18"
+          x={width * 0.4}
+          y={height - 100}
+          fontSize="16"
           fill="#FFFFFF"
-          textAnchor="middle"
+          textAnchor="start"
           fontWeight="bold"
         >
           Y: {sensorData.bubblePitch.toFixed(1)}°
         </SvgText>
         <SvgText
-          x={centerX}
-          y={height - 66}
-          fontSize="18"
+          x={width * 0.7}
+          y={height - 100}
+          fontSize="16"
           fill="#FFFFFF"
-          textAnchor="middle"
+          textAnchor="start"
           fontWeight="bold"
         >
           Dev:{" "}
@@ -678,7 +688,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         ]}
         onPress={onToggleCamera}
       >
-        <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
+        <Ionicons name="camera-reverse-outline" size={24} color="#FFFFFF" />
       </TouchableOpacity>
 
       {/* Calibration indicator */}
@@ -689,7 +699,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
             { backgroundColor: "rgba(0, 0, 0, 0.25)" },
           ]}
         >
-          <Ionicons name="refresh" size={20} color="#FFFFFF" />
+          <Ionicons name="refresh-outline" size={20} color="#FFFFFF" />
         </View>
       )}
     </View>

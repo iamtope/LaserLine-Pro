@@ -43,11 +43,15 @@ const SensorCard: React.FC<SensorCardProps> = ({
   const getTrendIcon = () => {
     switch (trend) {
       case "up":
-        return <Ionicons name="trending-up" size={16} color="#4CAF50" />;
+        return (
+          <Ionicons name="trending-up-outline" size={16} color="#4CAF50" />
+        );
       case "down":
-        return <Ionicons name="trending-down" size={16} color="#F44336" />;
+        return (
+          <Ionicons name="trending-down-outline" size={16} color="#F44336" />
+        );
       default:
-        return <Ionicons name="remove" size={16} color="#9E9E9E" />;
+        return <Ionicons name="remove-outline" size={16} color="#9E9E9E" />;
     }
   };
 
@@ -263,7 +267,7 @@ export const SensorDashboard: React.FC = () => {
             />
             <SensorCard
               title="Accuracy"
-              icon="checkmark-circle"
+              icon="checkmark-circle-outline"
               value={formatValue(sensorData.location.accuracy)}
               unit="m"
               color="#607D8B"
@@ -306,18 +310,30 @@ export const SensorDashboard: React.FC = () => {
           <View style={styles.statusContainer}>
             <View style={styles.statusItem}>
               <Ionicons
-                name={locationPermission ? "checkmark-circle" : "close-circle"}
+                name={
+                  locationPermission
+                    ? "checkmark-circle-outline"
+                    : "close-circle-outline"
+                }
                 size={20}
                 color={locationPermission ? "#4CAF50" : "#F44336"}
               />
               <Text style={styles.statusText}>Location Permission</Text>
             </View>
             <View style={styles.statusItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={20}
+                color="#4CAF50"
+              />
               <Text style={styles.statusText}>Motion Sensors</Text>
             </View>
             <View style={styles.statusItem}>
-              <Ionicons name="checkmark-circle" size={20} color="#4CAF50" />
+              <Ionicons
+                name="checkmark-circle-outline"
+                size={20}
+                color="#4CAF50"
+              />
               <Text style={styles.statusText}>Orientation Sensors</Text>
             </View>
           </View>

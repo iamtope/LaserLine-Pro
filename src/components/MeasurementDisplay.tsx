@@ -62,18 +62,12 @@ export const MeasurementDisplay: React.FC<MeasurementDisplayProps> = ({
     </View>
   );
 
-  const renderSpiritMeasurements = () => (
-    <View style={styles.measurementContainer}>
-      {/* Removed spirit Deviation popup as per request */}
-    </View>
-  );
-
   const renderMeasurements = () => {
     switch (mode) {
       case "laser":
         return renderLaserMeasurements();
       case "spirit":
-        return renderSpiritMeasurements();
+        return null;
       default:
         return null;
     }
