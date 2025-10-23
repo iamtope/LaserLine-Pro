@@ -25,7 +25,7 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       id: "laser" as LevelingMode,
       title: "Laser Level",
       description: "Precision laser crosshair for alignment",
-      icon: "flashlight" as const,
+      icon: "flashlight-outline" as const,
       color: "#FF6B6B",
       requiresCamera: true,
     },
@@ -38,28 +38,22 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
       requiresCamera: false,
     },
     {
-      id: "clinometer" as LevelingMode,
-      title: "Clinometer",
-      description: "Measure angles and inclinations precisely",
-      icon: "analytics" as const,
+      id: "dashboard" as LevelingMode,
+      title: "Sensor Dashboard",
+      description: "Professional sensor monitoring and analytics",
+      icon: "analytics-outline" as const,
       color: "#45B7D1",
       requiresCamera: false,
-    },
-    {
-      id: "ruler" as LevelingMode,
-      title: "AR Ruler",
-      description: "Measure distances using augmented reality",
-      icon: "resize" as const,
-      color: "#96CEB4",
-      requiresCamera: true,
     },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>LaserLine Pro</Text>
-        <Text style={styles.subtitle}>Professional Leveling Tools</Text>
+        <Text style={styles.title}>Laserline Pro</Text>
+        <Text style={styles.subtitle}>
+          Professional Leveling and Measurement Tool
+        </Text>
       </View>
 
       <ScrollView
@@ -80,6 +74,10 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
               >
                 <Ionicons name={mode.icon} size={32} color="#FFFFFF" />
               </View>
+            </View>
+
+            <View style={styles.titleRow}>
+              <Text style={styles.modeTitle}>{mode.title}</Text>
               <View style={styles.cameraIndicator}>
                 <Ionicons
                   name={mode.requiresCamera ? "camera" : "phone-portrait"}
@@ -88,8 +86,6 @@ export const ModeSelectionScreen: React.FC<ModeSelectionScreenProps> = ({
                 />
               </View>
             </View>
-
-            <Text style={styles.modeTitle}>{mode.title}</Text>
             <Text style={styles.modeDescription}>{mode.description}</Text>
 
             <View style={styles.modeFooter}>
@@ -156,7 +152,7 @@ const styles = StyleSheet.create({
   },
   modeHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
     alignItems: "center",
     marginBottom: 12,
   },
@@ -167,6 +163,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  modeTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginRight: 12,
+  },
   cameraIndicator: {
     backgroundColor: "#333333",
     borderRadius: 20,
@@ -174,12 +181,6 @@ const styles = StyleSheet.create({
     height: 32,
     justifyContent: "center",
     alignItems: "center",
-  },
-  modeTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    color: "#FFFFFF",
-    marginBottom: 8,
   },
   modeDescription: {
     fontSize: 14,

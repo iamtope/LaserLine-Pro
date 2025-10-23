@@ -1,0 +1,69 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Professional gradient background -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#16213e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f1419;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Laser beam gradient -->
+    <linearGradient id="laser" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0" />
+      <stop offset="30%" style="stop-color:#00ff88;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#00ff88;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
+    </linearGradient>
+    
+    <!-- Crosshair gradient -->
+    <linearGradient id="crosshair" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cc0000;stop-opacity:1" />
+    </linearGradient>
+    
+    <!-- Glow effect -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background with rounded corners -->
+  <rect width="1024" height="1024" rx="180" ry="180" fill="url(#bg)"/>
+  
+  <!-- Device body -->
+  <rect x="250" y="450" width="524" height="100" rx="50" ry="50" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="3"/>
+  
+  <!-- Device screen -->
+  <rect x="280" y="480" width="464" height="40" rx="20" ry="20" fill="rgba(0,0,0,0.4)"/>
+  
+  <!-- Horizontal laser line -->
+  <line x1="150" y1="500" x2="874" y2="500" stroke="url(#laser)" stroke-width="8" filter="url(#glow)"/>
+  
+  <!-- Vertical laser line -->
+  <line x1="512" y1="150" x2="512" y2="874" stroke="url(#laser)" stroke-width="8" filter="url(#glow)"/>
+  
+  <!-- Crosshair center -->
+  <circle cx="512" cy="500" r="16" fill="url(#crosshair)" filter="url(#glow)"/>
+  
+  <!-- Crosshair lines -->
+  <line x1="496" y1="500" x2="528" y2="500" stroke="url(#crosshair)" stroke-width="6" filter="url(#glow)"/>
+  <line x1="512" y1="484" x2="512" y2="516" stroke="url(#crosshair)" stroke-width="6" filter="url(#glow)"/>
+  
+  <!-- Precision dots -->
+  <circle cx="400" cy="500" r="4" fill="#00ff88" opacity="0.9"/>
+  <circle cx="624" cy="500" r="4" fill="#00ff88" opacity="0.9"/>
+  <circle cx="512" cy="350" r="4" fill="#00ff88" opacity="0.9"/>
+  <circle cx="512" cy="650" r="4" fill="#00ff88" opacity="0.9"/>
+  
+  <!-- Level indicators -->
+  <rect x="420" y="430" width="184" height="6" rx="3" ry="3" fill="rgba(0,255,136,0.4)"/>
+  <rect x="420" y="564" width="184" height="6" rx="3" ry="3" fill="rgba(0,255,136,0.4)"/>
+  
+  <!-- Subtle outer ring -->
+  <circle cx="512" cy="512" r="480" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
+</svg>

@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "LaserLine Pro",
-    "slug": "LaserLine Pro",
-    "version": "1.0.0",
+    "name": "Laserline Pro",
+    "slug": "laserline-pro",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -14,12 +14,17 @@
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.iamtope.LaserlinePro",
+      "deploymentTarget": "16.0",
       "infoPlist": {
-        "NSCameraUsageDescription": "This app needs camera access to provide laser leveling functionality.",
-        "NSMicrophoneUsageDescription": "This app needs microphone access for video recording features."
-      }
+        "NSCameraUsageDescription": "This app needs camera access to provide laser leveling functionality."
+      },
+      "fonts": [
+        "node_modules/@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf"
+      ]
     },
     "android": {
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
@@ -28,10 +33,10 @@
       "predictiveBackGestureEnabled": false,
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE"
-      ]
+      ],
+      "package": "com.iamtope.LaserlinePro"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,17 +45,16 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow LaserLine Pro to access your camera to provide laser leveling functionality."
+          "cameraPermission": "Allow Laserline Pro to access your camera to provide laser leveling functionality."
         }
       ],
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Allow LaserLine Pro to save photos with measurement overlays.",
-          "savePhotosPermission": "Allow LaserLine Pro to save photos with measurement overlays.",
-          "isAccessMediaLocationEnabled": true
-        }
-      ]
-    ]
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2fdc820b-4086-4245-8b0e-3567f3eebbfb"
+      }
+    },
+    "owner": "iamtope"
   }
 }

@@ -9,12 +9,9 @@ import {
   Switch,
   Alert,
   Dimensions,
+  Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as MediaLibrary from "expo-media-library";
-import * as FileSystem from "expo-file-system";
-import { captureRef } from "react-native-view-shot";
-import { Platform } from "react-native";
 import { LevelingMode } from "../../App";
 import { useSensors } from "../context/SensorContext";
 import {
@@ -30,8 +27,6 @@ interface ControlPanelProps {
   mode: LevelingMode;
   isCalibrating: boolean;
   onCalibrationToggle: (value: boolean) => void;
-  cameraRef?: React.RefObject<any>;
-  onCapture?: () => void;
   flashMode?: "on" | "off" | "auto" | "torch";
   onFlashModeChange?: (mode: "on" | "off" | "auto" | "torch") => void;
 }
@@ -40,8 +35,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   mode,
   isCalibrating,
   onCalibrationToggle,
-  cameraRef,
-  onCapture,
   flashMode = "off",
   onFlashModeChange,
 }) => {
@@ -49,100 +42,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const { calibrate, resetCalibration, isCalibrated } = useSensors();
   const { settings, updateSetting } = useSettings();
   const { clearAllMeasurements, setUnit, currentUnit, addPoint } = useRuler();
-
-  const handleCapture = async () => {
-    try {
-      // Request permissions
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Required",
-          "Permission to access media library is required!"
-        );
-        return;
-      }
-
-      // Capture the camera view with overlay
-      const imageUri = await captureCameraWithOverlay();
-
-      if (imageUri) {
-        // Save directly to gallery
-        await MediaLibrary.saveToLibraryAsync(imageUri);
-        Alert.alert("Success", "Photo captured and saved to gallery!");
-
-        // Call the onCapture callback if provided
-        if (onCapture) {
-          onCapture();
-        }
-      } else {
-        Alert.alert("Error", "Failed to capture photo");
-      }
-    } catch (error) {
-      console.error("Error capturing photo:", error);
-      Alert.alert("Error", "Failed to capture photo");
-    }
-  };
-
-  const captureCameraWithOverlay = async (): Promise<string | null> => {
-    try {
-      if (!cameraRef?.current) {
-        console.error("Camera ref not available");
-        return null;
-      }
-
-      // Capture the camera view as an image
-      const imageUri = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-        base64: false,
-        skipProcessing: false,
-      });
-
-      if (!imageUri) {
-        console.error("Failed to capture camera image");
-        return null;
-      }
-
-      // Create a measurement overlay image
-      const overlayUri = await createMeasurementOverlay();
-
-      if (overlayUri) {
-        // Combine camera image with measurement overlay
-        const finalImageUri = await combineImages(imageUri.uri, overlayUri);
-        return finalImageUri;
-      }
-
-      return imageUri.uri;
-    } catch (error) {
-      console.error("Error capturing camera with overlay:", error);
-      return null;
-    }
-  };
-
-  const createMeasurementOverlay = async (): Promise<string | null> => {
-    try {
-      // For now, we'll just return null as overlay creation is not essential
-      // In a real implementation, you'd create an actual image overlay
-      return null;
-    } catch (error) {
-      console.error("Error creating measurement overlay:", error);
-      return null;
-    }
-  };
-
-  const combineImages = async (
-    cameraImageUri: string,
-    overlayUri: string
-  ): Promise<string | null> => {
-    try {
-      // For now, we'll just return the camera image
-      // In a real implementation, you'd use an image processing library
-      // to overlay the measurement data on the camera image
-      return cameraImageUri;
-    } catch (error) {
-      console.error("Error combining images:", error);
-      return null;
-    }
-  };
 
   const handleCalibration = () => {
     if (isCalibrating) {
@@ -158,6 +57,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
       visible={showSettings}
       animationType="slide"
       presentationStyle="pageSheet"
+      onRequestClose={() => setShowSettings(false)}
     >
       <View style={styles.modalContainer}>
         <View style={styles.modalHeader}>
@@ -260,20 +160,32 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             </View>
           </View>
 
-          {/* Calibration */}
+          {/* Support */}
           <View style={styles.settingSection}>
-            <Text style={styles.sectionTitle}>Calibration</Text>
+            <Text style={styles.sectionTitle}>Support</Text>
             <TouchableOpacity
-              style={styles.calibrationButton}
-              onPress={resetCalibration}
+              style={styles.supportButton}
+              onPress={async () => {
+                const email = "adamoabasstope@gmail.com";
+                const subject = "Laserline Pro Support";
+                const body = "Hi,\n\nI need help with Laserline Pro.\n\n";
+                const url = `mailto:${email}?subject=${encodeURIComponent(
+                  subject
+                )}&body=${encodeURIComponent(body)}`;
+                try {
+                  const supported = await Linking.canOpenURL(url);
+                  if (supported) {
+                    await Linking.openURL(url);
+                  } else {
+                    Alert.alert("Support", `Contact us at: ${email}`);
+                  }
+                } catch (e) {
+                  Alert.alert("Support", `Contact us at: ${email}`);
+                }
+              }}
             >
-              <Text style={styles.calibrationButtonText}>
-                Reset Calibration
-              </Text>
+              <Text style={styles.supportButtonText}>Contact Support</Text>
             </TouchableOpacity>
-            {isCalibrated && (
-              <Text style={styles.calibrationStatus}>Device is calibrated</Text>
-            )}
           </View>
         </ScrollView>
       </View>
@@ -294,111 +206,72 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
           >
             <Ionicons
               name={isCalibrating ? "checkmark" : "refresh"}
-              size={24}
+              size={20}
               color={isCalibrating ? "#000" : "#FFFFFF"}
             />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.controlButton}
-            onPress={handleCapture}
-          >
-            <Ionicons name="camera" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
         {/* Center controls */}
         <View style={styles.centerControls}>
-          {mode === "ruler" ? (
-            <>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={clearAllMeasurements}
-              >
-                <Ionicons name="trash" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() => {
-                  const units = ["cm", "m", "ft", "in"] as const;
-                  const currentIndex = units.indexOf(currentUnit);
-                  const nextUnit = units[(currentIndex + 1) % units.length];
-                  setUnit(nextUnit);
-                }}
-              >
-                <Ionicons name="resize" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            </>
-          ) : (
-            <>
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() =>
-                  updateSetting("gridEnabled", !settings.gridEnabled)
-                }
-              >
-                <Ionicons
-                  name={settings.gridEnabled ? "grid" : "grid-outline"}
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.controlButton}
-                onPress={() =>
-                  updateSetting(
-                    "orientationLocked",
-                    !settings.orientationLocked
-                  )
-                }
-              >
-                <Ionicons
-                  name={
-                    settings.orientationLocked ? "lock-closed" : "lock-open"
-                  }
-                  size={24}
-                  color="#FFFFFF"
-                />
-              </TouchableOpacity>
-            </>
-          )}
-        </View>
-
-        {/* Right side controls - mode specific */}
-        <View style={styles.rightControls}>
-          {/* Camera-specific controls (flash) */}
-          {(mode === "laser" || mode === "ruler") && (
+          <>
             <TouchableOpacity
               style={styles.controlButton}
-              onPress={() => {
-                if (onFlashModeChange) {
-                  const nextMode =
-                    flashMode === "off"
-                      ? "torch"
-                      : flashMode === "torch"
-                      ? "auto"
-                      : "off";
-                  onFlashModeChange(nextMode);
-                }
-              }}
+              onPress={() =>
+                updateSetting("gridEnabled", !settings.gridEnabled)
+              }
             >
               <Ionicons
-                name={
-                  flashMode === "torch"
-                    ? "flash"
-                    : flashMode === "auto"
-                    ? "flash-outline"
-                    : "flash-off"
-                }
-                size={24}
-                color={flashMode === "off" ? "#666666" : "#FFFFFF"}
+                name={settings.gridEnabled ? "grid" : "grid-outline"}
+                size={20}
+                color="#FFFFFF"
               />
             </TouchableOpacity>
-          )}
 
-          {/* Sound control for all modes */}
+            <TouchableOpacity
+              style={styles.controlButton}
+              onPress={() =>
+                updateSetting("orientationLocked", !settings.orientationLocked)
+              }
+            >
+              <Ionicons
+                name={settings.orientationLocked ? "lock-closed" : "lock-open"}
+                size={24}
+                color="#FFFFFF"
+              />
+            </TouchableOpacity>
+          </>
+        </View>
+
+        {/* Right side controls */}
+        <View style={styles.rightControls}>
+          <TouchableOpacity
+            style={styles.controlButton}
+            onPress={() => {
+              if (onFlashModeChange) {
+                const nextMode =
+                  flashMode === "off"
+                    ? "torch"
+                    : flashMode === "torch"
+                    ? "auto"
+                    : "off";
+                onFlashModeChange(nextMode);
+              }
+            }}
+          >
+            <Ionicons
+              name={
+                flashMode === "torch"
+                  ? "flash-outline"
+                  : flashMode === "auto"
+                  ? "flash-outline"
+                  : "flash-off-outline"
+              }
+              size={24}
+              color={flashMode === "off" ? "#666666" : "#FFFFFF"}
+            />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.controlButton}
             onPress={() =>
@@ -406,18 +279,21 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             }
           >
             <Ionicons
-              name={settings.soundEnabled ? "volume-high" : "volume-mute"}
-              size={24}
+              name={
+                settings.soundEnabled
+                  ? "volume-high-outline"
+                  : "volume-mute-outline"
+              }
+              size={20}
               color="#FFFFFF"
             />
           </TouchableOpacity>
 
-          {/* Settings for all modes */}
           <TouchableOpacity
             style={styles.controlButton}
             onPress={() => setShowSettings(true)}
           >
-            <Ionicons name="settings" size={24} color="#FFFFFF" />
+            <Ionicons name="settings" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>
@@ -435,28 +311,30 @@ const styles = StyleSheet.create({
     right: 0,
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 12,
     zIndex: 10,
   },
   leftControls: {
     flexDirection: "row",
-    gap: 12,
+    gap: 6,
   },
   centerControls: {
     flexDirection: "row",
-    gap: 12,
+    gap: 6,
   },
   rightControls: {
     flexDirection: "row",
-    gap: 12,
+    gap: 6,
   },
   controlButton: {
-    backgroundColor: "rgba(0, 0, 0, 0.7)",
-    borderRadius: 25,
-    width: 50,
-    height: 50,
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    borderRadius: 22,
+    width: 44,
+    height: 44,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   activeControlButton: {
     backgroundColor: "#FFFFFF",
@@ -519,20 +397,20 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000",
   },
-  calibrationButton: {
-    backgroundColor: "#FF3B30",
+  supportButton: {
+    backgroundColor: "#007AFF",
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
   },
-  calibrationButtonText: {
+  supportButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "600",
   },
-  calibrationStatus: {
+  supportText: {
     fontSize: 14,
-    color: "#34C759",
+    color: "#666666",
     textAlign: "center",
     marginTop: 10,
   },

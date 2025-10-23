@@ -38,67 +38,6 @@ export const MeasurementDisplay: React.FC<MeasurementDisplayProps> = ({
     <View style={styles.measurementContainer}>
       <View style={styles.measurementRow}>
         <Text style={styles.measurementLabel}>Angle:</Text>
-        <Text
-          style={[
-            styles.measurementValue,
-            { color: sensorData.isLevel ? "#00FF00" : "#FF0000" },
-          ]}
-        >
-          {formatValue(sensorData.angle)}
-        </Text>
-      </View>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Pitch:</Text>
-        <Text style={styles.measurementValue}>
-          {formatValue(sensorData.pitch)}
-        </Text>
-      </View>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Roll:</Text>
-        <Text style={styles.measurementValue}>
-          {formatValue(sensorData.roll)}
-        </Text>
-      </View>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Status:</Text>
-        <Text
-          style={[
-            styles.measurementValue,
-            { color: sensorData.isLevel ? "#00FF00" : "#FF0000" },
-          ]}
-        >
-          {sensorData.isLevel ? "LEVEL" : "NOT LEVEL"}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const renderSpiritMeasurements = () => (
-    <View style={styles.measurementContainer}>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Bubble Position:</Text>
-        <Text
-          style={[
-            styles.measurementValue,
-            { color: sensorData.isLevel ? "#00FF00" : "#FF0000" },
-          ]}
-        >
-          {sensorData.isLevel ? "CENTER" : "OFF CENTER"}
-        </Text>
-      </View>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Deviation:</Text>
-        <Text style={styles.measurementValue}>
-          {formatValue(sensorData.angle)}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const renderClinometerMeasurements = () => (
-    <View style={styles.measurementContainer}>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Total Angle:</Text>
         <Text style={styles.measurementValue}>
           {formatValue(sensorData.angle)}
         </Text>
@@ -115,34 +54,6 @@ export const MeasurementDisplay: React.FC<MeasurementDisplayProps> = ({
           {formatValue(sensorData.roll)}
         </Text>
       </View>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Slope:</Text>
-        <Text style={styles.measurementValue}>
-          {formatValue(Math.tan((sensorData.angle * Math.PI) / 180) * 100)}%
-        </Text>
-      </View>
-    </View>
-  );
-
-  const renderRulerMeasurements = () => (
-    <View style={styles.measurementContainer}>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Total Measurements:</Text>
-        <Text style={styles.measurementValue}>{measurements.length}</Text>
-      </View>
-      <View style={styles.measurementRow}>
-        <Text style={styles.measurementLabel}>Unit:</Text>
-        <Text style={styles.measurementValue}>{currentUnit}</Text>
-      </View>
-      {measurements.length > 0 && (
-        <View style={styles.measurementRow}>
-          <Text style={styles.measurementLabel}>Latest:</Text>
-          <Text style={styles.measurementValue}>
-            {measurements[measurements.length - 1].distance.toFixed(1)}{" "}
-            {currentUnit}
-          </Text>
-        </View>
-      )}
     </View>
   );
 
@@ -151,15 +62,16 @@ export const MeasurementDisplay: React.FC<MeasurementDisplayProps> = ({
       case "laser":
         return renderLaserMeasurements();
       case "spirit":
-        return renderSpiritMeasurements();
-      case "clinometer":
-        return renderClinometerMeasurements();
-      case "ruler":
-        return renderRulerMeasurements();
+        return null;
       default:
         return null;
     }
   };
+
+  // Don't render anything for spirit mode
+  if (mode === "spirit") {
+    return null;
+  }
 
   return <View style={[styles.container, style]}>{renderMeasurements()}</View>;
 };

@@ -44,23 +44,42 @@ export const AROverlay: React.FC<AROverlayProps> = ({
   const { measurements, currentPoints, addPoint, clearPoints, currentUnit } =
     useRuler();
 
-  // PanResponder for handling touches in ruler mode
+  // PanResponder for handling touches (not used in current modes)
   const panResponder = PanResponder.create({
-    onStartShouldSetPanResponder: () => mode === "ruler",
+    onStartShouldSetPanResponder: () => false,
     onMoveShouldSetPanResponder: () => false,
     onPanResponderGrant: (evt) => {
-      if (mode === "ruler") {
-        const { locationX, locationY } = evt.nativeEvent;
-        addPoint(locationX, locationY);
-      }
+      // Not used in current modes
     },
   });
   const renderLaserMode = () => {
-    const { pitch, roll, angle, isLevel } = sensorData;
+    const { pitch, roll, angle } = sensorData;
     const lineOpacity = 0.8;
 
-    // Calculate rotation angle from pitch and roll
-    const rotationAngle = Math.atan2(pitch, roll) * (180 / Math.PI);
+    // Professional Laser Level Algorithm
+    // Based on real physics and phone orientation
+
+    // Get the device's orientation angles (in degrees)
+    const pitchDegrees = pitch; // Forward/backward tilt
+    const rollDegrees = roll; // Left/right tilt
+
+    // Convert to radians for calculations
+    const pitchRad = (pitchDegrees * Math.PI) / 180;
+    const rollRad = (rollDegrees * Math.PI) / 180;
+
+    // Calculate the tilt angle from horizontal (0 = perfectly level)
+    // This is the actual angle the phone is tilted from level
+    const tiltAngle = Math.sqrt(pitchRad * pitchRad + rollRad * rollRad);
+
+    // Calculate the direction of tilt (which way the phone is leaning)
+    const tiltDirection = Math.atan2(pitchRad, rollRad);
+
+    // For laser level: the crosshair should rotate to show the tilt direction
+    // The rotation should be proportional to the tilt angle but capped for usability
+    const maxRotationDegrees = 30; // Maximum rotation for visual clarity
+    const rotationAngle =
+      Math.min(tiltAngle * (180 / Math.PI), maxRotationDegrees) *
+      Math.sin(tiltDirection);
 
     // Line length for the rotating cross
     const lineLength = 150;
@@ -68,10 +87,10 @@ export const AROverlay: React.FC<AROverlayProps> = ({
     return (
       <Svg height={height} width={width} style={StyleSheet.absoluteFill}>
         <Defs>
-          <LinearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <Stop offset="0%" stopColor="#0066FF" stopOpacity="0" />
-            <Stop offset="50%" stopColor="#0066FF" stopOpacity={lineOpacity} />
-            <Stop offset="100%" stopColor="#0066FF" stopOpacity="0" />
+          <LinearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <Stop offset="0%" stopColor="#00FF00" stopOpacity="0" />
+            <Stop offset="50%" stopColor="#00FF00" stopOpacity={lineOpacity} />
+            <Stop offset="100%" stopColor="#00FF00" stopOpacity="0" />
           </LinearGradient>
           <LinearGradient id="redGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <Stop offset="0%" stopColor="#FF0000" stopOpacity="0" />
@@ -80,24 +99,24 @@ export const AROverlay: React.FC<AROverlayProps> = ({
           </LinearGradient>
         </Defs>
 
-        {/* Fixed Blue Reference Lines (Always at 90 degrees) */}
-        {/* Horizontal blue line - always at center */}
+        {/* Fixed Green Reference Lines (Always at 90 degrees) */}
+        {/* Horizontal green line - always at center */}
         <Line
           x1={0}
           y1={centerY}
           x2={width}
           y2={centerY}
-          stroke="#0066FF"
+          stroke="#00FF00"
           strokeWidth="1"
         />
 
-        {/* Vertical blue line - always at center */}
+        {/* Vertical green line - always at center */}
         <Line
           x1={centerX}
           y1={0}
           x2={centerX}
           y2={height}
-          stroke="#0066FF"
+          stroke="#00FF00"
           strokeWidth="1"
         />
 
@@ -190,19 +209,12 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         >
           {angle.toFixed(settings.precision)}°
         </SvgText>
-
-        <Circle
-          cx={centerX + 60}
-          cy={centerY + 20}
-          r="6"
-          fill={isLevel ? "#00FF00" : "#FF0000"}
-        />
       </Svg>
     );
   };
 
   const renderSpiritMode = () => {
-    const { pitch, roll, isLevel } = sensorData;
+    const { pitch, roll } = sensorData;
     const { isCalibrated, calibrate, resetCalibration } = useSensors();
 
     // Apply calibration offsets - adjust these values based on your device
@@ -210,13 +222,6 @@ export const AROverlay: React.FC<AROverlayProps> = ({
     const calibratedPitch = pitch; // Y-axis (forward-backward tilt)
 
     // Debug: Log the raw values to understand the coordinate system
-    console.log("Raw sensor data:", {
-      pitch,
-      roll,
-      calibratedPitch,
-      calibratedRoll,
-      isCalibrated,
-    });
 
     // EXACT colors from the image
     const liquidGreen = "#00FF00"; // Bright neon lime green like in the image
@@ -248,8 +253,8 @@ export const AROverlay: React.FC<AROverlayProps> = ({
     // Horizontal container boundaries
     const horizontalContainerLeft = centerX - width * 0.45;
     const horizontalContainerRight = centerX + width * 0.45;
-    const horizontalContainerTop = centerY - 210;
-    const horizontalContainerBottom = centerY - 160;
+    const horizontalContainerTop = centerY - 260;
+    const horizontalContainerBottom = centerY - 210;
     const horizontalContainerWidth = width * 0.9;
     const horizontalContainerHeight = 50;
 
@@ -400,7 +405,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         {/* Horizontal Level Indicator (Top) - Enhanced */}
         <Rect
           x={centerX - width * 0.45}
-          y={centerY - 210}
+          y={centerY - 260}
           width={width * 0.9}
           height="50"
           rx="0"
@@ -413,7 +418,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         {/* Horizontal liquid with depth */}
         <Rect
           x={centerX - width * 0.45 + 5}
-          y={centerY - 205}
+          y={centerY - 255}
           width={width * 0.9 - 10}
           height="40"
           rx="0"
@@ -427,18 +432,18 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         {/* Horizontal level markers - Enhanced with wider boundary */}
         <Line
           x1={centerX - 25}
-          y1={centerY - 210}
+          y1={centerY - 260}
           x2={centerX - 25}
-          y2={centerY - 160}
+          y2={centerY - 210}
           stroke="#000000"
           strokeWidth="2.5"
           strokeOpacity="0.8"
         />
         <Line
           x1={centerX + 25}
-          y1={centerY - 210}
+          y1={centerY - 260}
           x2={centerX + 25}
-          y2={centerY - 160}
+          y2={centerY - 210}
           stroke="#000000"
           strokeWidth="2.5"
           strokeOpacity="0.8"
@@ -447,7 +452,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         {/* Horizontal bubble - Enhanced */}
         <Circle
           cx={horizontalBubbleConstrainedX}
-          cy={centerY - 185}
+          cy={centerY - 235}
           r={bubbleRadius * 0.6}
           fill="url(#bubbleGradient)"
           stroke="#DDDDDD"
@@ -455,16 +460,7 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         />
 
         {/* Level indicator for horizontal */}
-        {Math.abs(sensorData.bubbleRoll) < 0.3 && (
-          <Circle
-            cx={centerX}
-            cy={centerY - 185}
-            r="3"
-            fill="#00FF00"
-            stroke="#FFFFFF"
-            strokeWidth="1"
-          />
-        )}
+        {/* Removed green dot inside horizontal bubble */}
 
         {/* Vertical Level Indicator (Left) - Enhanced */}
         <Rect
@@ -619,323 +615,44 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         )}
 
         {/* Angle readings - EXACT positioning from image */}
-        {/* Angle display moved to bottom */}
+        {/* Centered vertical stack for X, Y, Dev */}
+        {/* X, Y, Dev values with equal left and right margins */}
         <SvgText
-          x={centerX}
-          y={height - 80}
-          fontSize="18"
-          fill="#FFFFFF"
-          textAnchor="middle"
-          fontWeight="bold"
-        >
-          X: {sensorData.bubbleRoll.toFixed(1)}° | Y:{" "}
-          {sensorData.bubblePitch.toFixed(1)}°
-        </SvgText>
-
-        {/* Control Icons - Auto-calibration always active */}
-        {/* AD Icon - Auto Calibrate (Always Active) */}
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            left: centerX - 120 - 22,
-            top: height - 90 - 22,
-            width: 44,
-            height: 44,
-            borderRadius: 22,
-          }}
-          onPress={calibrate}
-        >
-          <Circle
-            cx={centerX - 120}
-            cy={height - 90}
-            r="22"
-            fill="#00FF00"
-            stroke="#000000"
-            strokeWidth="1"
-          />
-          <SvgText
-            x={centerX - 120}
-            y={height - 85}
-            fontSize="10"
-            fill="#FFFFFF"
-            textAnchor="middle"
-            fontWeight="bold"
-          >
-            AD
-          </SvgText>
-        </TouchableOpacity>
-
-        {/* Gravity Reference Icon */}
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            left: centerX - 60 - 22,
-            top: height - 90 - 22,
-            width: 44,
-            height: 44,
-            borderRadius: 22,
-          }}
-          onPress={resetCalibration}
-        >
-          <Circle
-            cx={centerX - 60}
-            cy={height - 90}
-            r="22"
-            fill="#00FF00"
-            stroke="#000000"
-            strokeWidth="1"
-          />
-          {/* Gravity arrow pointing down */}
-          <Line
-            x1={centerX - 60}
-            y1={height - 100}
-            x2={centerX - 60}
-            y2={height - 80}
-            stroke="#FFFFFF"
-            strokeWidth="3"
-            strokeLinecap="round"
-          />
-          <Line
-            x1={centerX - 65}
-            y1={height - 85}
-            x2={centerX - 60}
-            y2={height - 80}
-            stroke="#FFFFFF"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-          <Line
-            x1={centerX - 55}
-            y1={height - 85}
-            x2={centerX - 60}
-            y2={height - 80}
-            stroke="#FFFFFF"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        </TouchableOpacity>
-
-        {/* Precision/Unit Toggle Icon */}
-        <Circle
-          cx={centerX}
-          cy={height - 90}
-          r="22"
-          fill={darkGrey}
-          stroke="#000000"
-          strokeWidth="1"
-        />
-        <SvgText
-          x={centerX}
-          y={height - 85}
-          fontSize="10"
-          fill="#FFFFFF"
-          textAnchor="middle"
-          fontWeight="bold"
-        >
-          .0°
-        </SvgText>
-
-        {/* Lock/Unlock Icon */}
-        <Circle
-          cx={centerX + 60}
-          cy={height - 90}
-          r="22"
-          fill={darkGrey}
-          stroke="#000000"
-          strokeWidth="1"
-        />
-        {/* Unlock icon - smaller as in image */}
-        <Circle
-          cx={centerX + 60}
-          cy={height - 95}
-          r="6"
-          fill="none"
-          stroke="#FFFFFF"
-          strokeWidth="2"
-        />
-        <Line
-          x1={centerX + 60}
-          y1={height - 89}
-          x2={centerX + 60}
-          y2={height - 83}
-          stroke="#FFFFFF"
-          strokeWidth="2"
-        />
-      </Svg>
-    );
-  };
-
-  const renderClinometerMode = () => {
-    const { pitch, roll, angle } = sensorData;
-    const angleText = angle.toFixed(settings.precision);
-
-    return (
-      <Svg height={height} width={width} style={StyleSheet.absoluteFill}>
-        {/* Angle arc */}
-        <Circle
-          cx={centerX}
-          cy={centerY}
-          r="100"
-          fill="none"
-          stroke="#FFFFFF"
-          strokeWidth="2"
-          strokeOpacity="0.8"
-        />
-
-        {/* Angle lines */}
-        <Line
-          x1={centerX}
-          y1={centerY}
-          x2={centerX + Math.cos((pitch * Math.PI) / 180) * 100}
-          y2={centerY + Math.sin((pitch * Math.PI) / 180) * 100}
-          stroke="#FF0000"
-          strokeWidth="3"
-        />
-
-        <Line
-          x1={centerX}
-          y1={centerY}
-          x2={centerX + Math.cos((roll * Math.PI) / 180) * 100}
-          y2={centerY + Math.sin((roll * Math.PI) / 180) * 100}
-          stroke="#00FF00"
-          strokeWidth="3"
-        />
-
-        {/* Center point */}
-        <Circle cx={centerX} cy={centerY} r="6" fill="#FFFFFF" />
-
-        {/* Angle display */}
-        <SvgText
-          x={centerX - 30}
-          y={centerY - 120}
-          fontSize="32"
-          fill="#FFFFFF"
-          fontWeight="bold"
-          textAnchor="middle"
-        >
-          {angleText}°
-        </SvgText>
-
-        {/* Pitch and Roll readings */}
-        <SvgText
-          x={centerX - 30}
-          y={centerY - 80}
-          fontSize="16"
-          fill="#FF0000"
-          textAnchor="middle"
-        >
-          Pitch: {pitch.toFixed(settings.precision)}°
-        </SvgText>
-        <SvgText
-          x={centerX - 30}
-          y={centerY - 60}
-          fontSize="16"
-          fill="#00FF00"
-          textAnchor="middle"
-        >
-          Roll: {roll.toFixed(settings.precision)}°
-        </SvgText>
-      </Svg>
-    );
-  };
-
-  const renderRulerMode = () => {
-    return (
-      <Svg height={height} width={width} style={StyleSheet.absoluteFill}>
-        {/* Render all completed measurements */}
-        {measurements.map((measurement) => (
-          <React.Fragment key={measurement.id}>
-            {/* Measurement line */}
-            <Line
-              x1={measurement.startPoint.x}
-              y1={measurement.startPoint.y}
-              x2={measurement.endPoint.x}
-              y2={measurement.endPoint.y}
-              stroke="#00FF00"
-              strokeWidth="2"
-            />
-
-            {/* Start point */}
-            <Circle
-              cx={measurement.startPoint.x}
-              cy={measurement.startPoint.y}
-              r="6"
-              fill="#00FF00"
-            />
-
-            {/* End point */}
-            <Circle
-              cx={measurement.endPoint.x}
-              cy={measurement.endPoint.y}
-              r="6"
-              fill="#00FF00"
-            />
-
-            {/* Distance label */}
-            <SvgText
-              x={(measurement.startPoint.x + measurement.endPoint.x) / 2}
-              y={(measurement.startPoint.y + measurement.endPoint.y) / 2 - 10}
-              fontSize="16"
-              fill="#FFFFFF"
-              fontWeight="bold"
-              textAnchor="middle"
-            >
-              {measurement.distance.toFixed(1)} {measurement.unit}
-            </SvgText>
-          </React.Fragment>
-        ))}
-
-        {/* Render current measurement in progress */}
-        {currentPoints.map((point, index) => (
-          <Circle
-            key={point.id}
-            cx={point.x}
-            cy={point.y}
-            r="8"
-            fill={index === 0 ? "#FF0000" : "#00FF00"}
-            stroke="#FFFFFF"
-            strokeWidth="2"
-          />
-        ))}
-
-        {/* Draw line between current points */}
-        {currentPoints.length === 2 && (
-          <Line
-            x1={currentPoints[0].x}
-            y1={currentPoints[0].y}
-            x2={currentPoints[1].x}
-            y2={currentPoints[1].y}
-            stroke="#FF0000"
-            strokeWidth="2"
-            strokeDasharray="5,5"
-          />
-        )}
-
-        {/* Instructions */}
-        <SvgText
-          x={width / 2}
+          x={width * 0.15}
           y={height - 100}
-          fontSize="18"
+          fontSize="16"
           fill="#FFFFFF"
+          textAnchor="start"
           fontWeight="bold"
-          textAnchor="middle"
         >
-          {currentPoints.length === 0
-            ? "Tap to start measurement"
-            : currentPoints.length === 1
-            ? "Tap to complete measurement"
-            : "Tap to start new measurement"}
+          X: {sensorData.bubbleRoll.toFixed(1)}°
+        </SvgText>
+        <SvgText
+          x={width * 0.4}
+          y={height - 100}
+          fontSize="16"
+          fill="#FFFFFF"
+          textAnchor="start"
+          fontWeight="bold"
+        >
+          Y: {sensorData.bubblePitch.toFixed(1)}°
+        </SvgText>
+        <SvgText
+          x={width * 0.7}
+          y={height - 100}
+          fontSize="16"
+          fill="#FFFFFF"
+          textAnchor="start"
+          fontWeight="bold"
+        >
+          Dev:{" "}
+          {Math.sqrt(
+            sensorData.bubbleRoll * sensorData.bubbleRoll +
+              sensorData.bubblePitch * sensorData.bubblePitch
+          ).toFixed(1)}
+          °
         </SvgText>
 
-        {/* Unit display */}
-        <SvgText x={20} y={height - 50} fontSize="14" fill="#FFFFFF">
-          Unit: {currentUnit}
-        </SvgText>
-
-        {/* Measurement count */}
-        <SvgText x={20} y={height - 30} fontSize="14" fill="#FFFFFF">
-          Measurements: {measurements.length}
-        </SvgText>
       </Svg>
     );
   };
@@ -946,34 +663,35 @@ export const AROverlay: React.FC<AROverlayProps> = ({
         return renderLaserMode();
       case "spirit":
         return renderSpiritMode();
-      case "clinometer":
-        return renderClinometerMode();
-      case "ruler":
-        return renderRulerMode();
       default:
         return null;
     }
   };
 
   return (
-    <View
-      style={[styles.container, mode === "ruler" && { pointerEvents: "auto" }]}
-      {...panResponder.panHandlers}
-    >
+    <View style={styles.container} {...panResponder.panHandlers}>
       {renderModeOverlay()}
 
       {/* Camera toggle button */}
       <TouchableOpacity
-        style={[styles.cameraToggle, { pointerEvents: "auto" }]}
+        style={[
+          styles.cameraToggle,
+          { backgroundColor: "rgba(0, 0, 0, 0.25)" },
+        ]}
         onPress={onToggleCamera}
       >
-        <Ionicons name="camera-reverse" size={24} color="#FFFFFF" />
+        <Ionicons name="camera-reverse-outline" size={24} color="#FFFFFF" />
       </TouchableOpacity>
 
       {/* Calibration indicator */}
       {isCalibrating && (
-        <View style={[styles.calibrationIndicator, { pointerEvents: "auto" }]}>
-          <Ionicons name="refresh" size={20} color="#FFFFFF" />
+        <View
+          style={[
+            styles.calibrationIndicator,
+            { backgroundColor: "rgba(0, 0, 0, 0.25)" },
+          ]}
+        >
+          <Ionicons name="refresh-outline" size={20} color="#FFFFFF" />
         </View>
       )}
     </View>
@@ -993,22 +711,26 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 50,
     right: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
     borderRadius: 25,
     width: 50,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
   },
   calibrationIndicator: {
     position: "absolute",
     top: 50,
     left: 20,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
     borderRadius: 25,
     width: 50,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FFFFFF",
   },
 });
