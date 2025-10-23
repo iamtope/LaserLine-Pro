@@ -1,0 +1,95 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradient definitions -->
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="laserGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0" />
+      <stop offset="20%" style="stop-color:#00ff88;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#00ff88;stop-opacity:1" />
+      <stop offset="80%" style="stop-color:#00ff88;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0" />
+    </linearGradient>
+    
+    <linearGradient id="crosshairGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#cc0000;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#ffffff;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0" />
+    </radialGradient>
+    
+    <!-- Drop shadow filter -->
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+    
+    <!-- Glow filter -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="200" ry="200" fill="url(#backgroundGradient)"/>
+  
+  <!-- Outer ring -->
+  <circle cx="512" cy="512" r="480" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="4"/>
+  
+  <!-- Inner ring -->
+  <circle cx="512" cy="512" r="420" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2"/>
+  
+  <!-- Laser level device body -->
+  <rect x="312" y="400" width="400" height="80" rx="40" ry="40" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+  
+  <!-- Device screen -->
+  <rect x="332" y="420" width="360" height="40" rx="20" ry="20" fill="rgba(0,0,0,0.3)"/>
+  
+  <!-- Horizontal laser line -->
+  <line x1="200" y1="440" x2="824" y2="440" stroke="url(#laserGradient)" stroke-width="6" filter="url(#glow)"/>
+  
+  <!-- Vertical laser line -->
+  <line x1="512" y1="200" x2="512" y2="824" stroke="url(#laserGradient)" stroke-width="6" filter="url(#glow)"/>
+  
+  <!-- Crosshair center -->
+  <circle cx="512" cy="440" r="12" fill="url(#crosshairGradient)" filter="url(#glow)"/>
+  
+  <!-- Crosshair lines -->
+  <line x1="500" y1="440" x2="524" y2="440" stroke="url(#crosshairGradient)" stroke-width="4" filter="url(#glow)"/>
+  <line x1="512" y1="428" x2="512" y2="452" stroke="url(#crosshairGradient)" stroke-width="4" filter="url(#glow)"/>
+  
+  <!-- Precision indicators -->
+  <circle cx="350" cy="440" r="3" fill="#00ff88" opacity="0.8"/>
+  <circle cx="674" cy="440" r="3" fill="#00ff88" opacity="0.8"/>
+  <circle cx="512" cy="300" r="3" fill="#00ff88" opacity="0.8"/>
+  <circle cx="512" cy="580" r="3" fill="#00ff88" opacity="0.8"/>
+  
+  <!-- Level indicators -->
+  <rect x="450" y="380" width="124" height="8" rx="4" ry="4" fill="rgba(0,255,136,0.3)"/>
+  <rect x="450" y="452" width="124" height="8" rx="4" ry="4" fill="rgba(0,255,136,0.3)"/>
+  
+  <!-- Professional glow effect -->
+  <circle cx="512" cy="440" r="200" fill="url(#glowGradient)" opacity="0.1"/>
+  
+  <!-- App name -->
+  <text x="512" y="650" font-family="Arial, sans-serif" font-size="48" font-weight="bold" text-anchor="middle" fill="rgba(255,255,255,0.9)">LASERLINE</text>
+  <text x="512" y="700" font-family="Arial, sans-serif" font-size="32" font-weight="300" text-anchor="middle" fill="rgba(0,255,136,0.8)">PRO</text>
+  
+  <!-- Subtle grid pattern -->
+  <defs>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.02)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#grid)"/>
+</svg>

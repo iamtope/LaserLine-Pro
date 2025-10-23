@@ -29,8 +29,7 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
       if (supported) {
         await Linking.openURL(coffeeUrl);
       }
-    } catch (error) {
-    }
+    } catch (error) {}
     onClose();
   };
 

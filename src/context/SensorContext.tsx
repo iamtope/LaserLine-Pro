@@ -11,7 +11,6 @@ import {
   Gyroscope,
   Magnetometer,
   Barometer,
-  Pedometer,
 } from "expo-sensors";
 import * as Location from "expo-location";
 import * as Haptics from "expo-haptics";
@@ -354,7 +353,6 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
             }));
           });
         } else {
-          console.log("Barometer not available on this device");
         }
       } catch (error) {
         console.log("Barometer setup failed:", error);
@@ -389,7 +387,6 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
               distanceInterval: 5,
             },
             (location) => {
-              console.log("Location updated:", location.coords);
               setSensorData((prev) => ({
                 ...prev,
                 location: {
@@ -415,7 +412,6 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
                 distanceInterval: 5,
               },
               (location) => {
-                console.log("Location updated:", location.coords);
                 setSensorData((prev) => ({
                   ...prev,
                   location: {
@@ -476,16 +472,12 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
   }, [permissionsRequested.location]);
 
   const calibrate = () => {
-    console.log(
-      "Auto-calibration is always active - no manual calibration needed"
-    );
+    
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const resetCalibration = () => {
-    console.log(
-      "Auto-calibration resets automatically - no manual reset needed"
-    );
+    
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 

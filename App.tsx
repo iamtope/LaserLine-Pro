@@ -96,7 +96,6 @@ const MainAppContent: React.FC<{
           mode={currentMode}
           isCalibrating={isCalibrating}
           onCalibrationToggle={setIsCalibrating}
-          cameraRef={cameraRef}
           flashMode={flashMode}
           onFlashModeChange={setFlashMode}
         />

@@ -10,34 +10,39 @@ A modern, cross-platform laser level application built with React Native and Exp
 
    - Real-time laser line projection using AR overlay
    - Horizontal and vertical level indicators
-   - Multiple laser lines for enhanced precision
-   - Visual and haptic feedback when level
+   - Rotating red crosshair that responds to device tilt
+   - Professional laser level algorithm
+   - Visual angle display
+   - Perfect for alignment and leveling tasks
 
 2. **Spirit Level Mode**
 
-   - Traditional bubble level interface
+   - Traditional bubble level interface with three levels
+   - Horizontal, vertical, and circular spirit levels
    - Real-time bubble position tracking
+   - X, Y, and Deviation angle readings
    - Visual level indicators
-   - Perfect for surface leveling
-   - Level represents horizontal surface, plumb is vertical
+   - Perfect for surface leveling and precision work
 
-3. **Clinometer Mode**
-   - Precise angle measurement
-   - Pitch and roll readings
-   - Slope percentage calculation
-   - Ideal for construction and surveying
+3. **Sensor Dashboard Mode**
+   - Comprehensive sensor data monitoring
+   - Real-time pitch, roll, and angle readings
+   - Gyroscope, accelerometer, and magnetometer data
+   - Location services integration
+   - Barometer readings (when available)
+   - Professional sensor analytics
 
 ### 🔧 Advanced Features
 
-- **Device Calibration**: Automatic calibration for accurate measurements
+- **Auto-Calibration**: Automatic sensor calibration for accurate measurements
 - **Multiple Units**: Degrees, percentages, and radians
-- **Precision Control**: Adjustable decimal places (0-2)
+- **Precision Control**: Adjustable decimal places (0-3)
 - **Grid Overlay**: Optional grid for better alignment
 - **Orientation Lock**: Prevent accidental rotation
-- **Photo Capture**: Save measurements with AR overlay
-- **Haptic Feedback**: Vibration when level is achieved
+- **Haptic Feedback**: Vibration feedback for interactions
 - **Sound Alerts**: Audio feedback for level detection
 - **Settings Persistence**: Save preferences across sessions
+- **Professional UI**: Clean, modern interface design
 
 ### 📱 Cross-Platform Support
 
@@ -60,19 +65,25 @@ A modern, cross-platform laser level application built with React Native and Exp
 ### Key Components
 
 - `CameraView`: Main camera interface with AR overlay
-- `AROverlay`: Custom SVG-based measurement overlays
-- `SensorContext`: Real-time sensor data management
+- `AROverlay`: Custom SVG-based measurement overlays for laser and spirit modes
+- `SensorDashboard`: Comprehensive sensor data display
+- `SensorContext`: Real-time sensor data management with auto-calibration
 - `SettingsContext`: App preferences and configuration
-- `ControlPanel`: User interface controls
-- `MeasurementDisplay`: Real-time measurement readings
+- `ControlPanel`: User interface controls and settings
+- `MeasurementDisplay`: Real-time measurement readings (laser mode only)
 - `ModeSelector`: Mode switching interface
+- `ModeSelectionScreen`: Main mode selection interface
+- `PremiumModal`: Support and donation interface
 
 ### Sensor Integration
 
 - **Gyroscope**: 60fps updates for smooth tracking
-- **Accelerometer**: Pitch and roll calculations
-- **Calibration**: Offset compensation for accuracy
-- **Level Detection**: Sub-degree precision
+- **Accelerometer**: Pitch and roll calculations with gravity normalization
+- **Magnetometer**: Compass and heading data
+- **Location Services**: GPS coordinates and altitude
+- **Barometer**: Atmospheric pressure and relative altitude
+- **Auto-Calibration**: Continuous sensor fusion and offset compensation
+- **Level Detection**: Sub-degree precision with professional algorithms
 
 ## Installation & Setup
 
@@ -117,25 +128,26 @@ expo build:android
 ### Getting Started
 
 1. **Launch the app** and grant camera permissions
-2. **Choose your mode**: Laser, Spirit, or Clinometer
-3. **Calibrate your device** by tapping the calibration button
+2. **Choose your mode**: Laser Level, Spirit Level, or Sensor Dashboard
+3. **Auto-calibration** runs continuously for accurate readings
 4. **Start measuring** by pointing your device at surfaces
 
 ### Calibration
 
-- Place your device on a known level surface
-- Tap the calibration button (refresh icon)
-- The app will automatically calibrate for accurate readings
+- **Automatic**: The app continuously calibrates sensors for accuracy
+- **No manual calibration needed**: Professional-grade auto-calibration system
+- **Sensor Fusion**: Combines gyroscope and accelerometer data for precision
 
 ### Settings
 
 Access settings by tapping the gear icon to:
 
-- Change measurement units
-- Adjust precision
-- Toggle sound/vibration
+- Change measurement units (degrees, percentage, radians)
+- Adjust precision (0-3 decimal places)
+- Toggle sound/vibration feedback
 - Enable/disable grid overlay
 - Lock orientation
+- Contact support
 
 ## Use Cases
 
@@ -163,10 +175,12 @@ Access settings by tapping the gear icon to:
 ## Technical Specifications
 
 - **Update Rate**: 60fps sensor updates
-- **Precision**: Sub-degree accuracy
-- **Calibration**: Automatic offset compensation
+- **Precision**: Sub-degree accuracy with professional algorithms
+- **Calibration**: Automatic sensor fusion and offset compensation
 - **Compatibility**: iOS 13+, Android 8+
-- **Permissions**: Camera, Storage, Sensors
+- **Permissions**: Camera, Storage, Sensors, Location (optional)
+- **Architecture**: React Native + Expo with TypeScript
+- **Sensors**: Gyroscope, Accelerometer, Magnetometer, GPS, Barometer
 
 ## Contributing
 
@@ -186,10 +200,44 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Built with React Native and Expo
 - Uses native device sensors for accuracy
 
-iOS
-//app Id - ca-app-pub-6244419407881612~6898094220
-//ad unit ID - ca-app-pub-6244419407881612/3652257433
+## Release Notes
 
-Android
-app Id - ca-app-pub-6244419407881612~4333756041
-ad unit ID - ca-app-pub-6244419407881612/9091258706
+### Version 2.0 - Professional Laser Level Update
+
+**New Features:**
+
+- **Sensor Dashboard**: Comprehensive sensor monitoring with real-time data
+- **Professional Laser Level**: Rotating crosshair with advanced tilt algorithms
+- **Enhanced Spirit Level**: Three-level system (horizontal, vertical, circular)
+- **Auto-Calibration**: Continuous sensor fusion for precision accuracy
+- **Interactive Controls**: Draggable laser crosshair positioning
+- **Modern UI**: Clean, professional interface design
+
+**Improvements:**
+
+- Sub-degree precision with professional algorithms
+- Real-time X, Y, and Deviation angle readings
+- Enhanced sensor integration (gyroscope, accelerometer, magnetometer, GPS, barometer)
+- Improved calibration system with automatic offset compensation
+- Better performance with 60fps sensor updates
+
+**Supported Languages:**
+
+- English
+- French
+- German
+- Chinese
+
+---
+
+## AdMob Configuration
+
+**iOS**
+
+- App ID: ca-app-pub-6244419407881612~6898094220
+- Ad Unit ID: ca-app-pub-6244419407881612/3652257433
+
+**Android**
+
+- App ID: ca-app-pub-6244419407881612~4333756041
+- Ad Unit ID: ca-app-pub-6244419407881612/9091258706

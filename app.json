@@ -47,14 +47,6 @@
           "cameraPermission": "Allow Laserline Pro to access your camera to provide laser leveling functionality."
         }
       ],
-      [
-        "expo-media-library",
-        {
-          "photosPermission": "Allow Laserline Pro to save photos with measurement overlays.",
-          "savePhotosPermission": "Allow Laserline Pro to save photos with measurement overlays.",
-          "isAccessMediaLocationEnabled": true
-        }
-      ],
       "expo-font"
     ],
     "extra": {

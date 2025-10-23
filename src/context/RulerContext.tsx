@@ -57,7 +57,6 @@ export const RulerProvider: React.FC<RulerProviderProps> = ({ children }) => {
   const screenHeight = screenDimensions.height;
 
   const defaultCalibrationFactor = () => {
-
     const estimatedPixelsPerCm = screenWidth / 8; // Assume 8cm phone width
 
     return estimatedPixelsPerCm;

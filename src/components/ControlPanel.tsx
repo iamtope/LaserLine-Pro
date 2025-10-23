@@ -12,10 +12,6 @@ import {
   Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import * as MediaLibrary from "expo-media-library";
-import * as FileSystem from "expo-file-system";
-import { captureRef } from "react-native-view-shot";
-import { Platform } from "react-native";
 import { LevelingMode } from "../../App";
 import { useSensors } from "../context/SensorContext";
 import {
@@ -31,8 +27,6 @@ interface ControlPanelProps {
   mode: LevelingMode;
   isCalibrating: boolean;
   onCalibrationToggle: (value: boolean) => void;
-  cameraRef?: React.RefObject<any>;
-  onCapture?: () => void;
   flashMode?: "on" | "off" | "auto" | "torch";
   onFlashModeChange?: (mode: "on" | "off" | "auto" | "torch") => void;
 }
@@ -41,8 +35,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   mode,
   isCalibrating,
   onCalibrationToggle,
-  cameraRef,
-  onCapture,
   flashMode = "off",
   onFlashModeChange,
 }) => {
@@ -50,102 +42,6 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
   const { calibrate, resetCalibration, isCalibrated } = useSensors();
   const { settings, updateSetting } = useSettings();
   const { clearAllMeasurements, setUnit, currentUnit, addPoint } = useRuler();
-
-  const handleCapture = async () => {
-    try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Required",
-          "Permission to access media library is required!"
-        );
-        return;
-      }
-
-      const imageUri = await captureCameraWithOverlay();
-
-      if (imageUri) {
-        await MediaLibrary.saveToLibraryAsync(imageUri);
-        Alert.alert("Success", "Photo captured and saved to gallery!");
-
-        if (onCapture) {
-          onCapture();
-        }
-      } else {
-        Alert.alert("Error", "Failed to capture photo");
-      }
-    } catch (error) {
-      console.error("Error capturing photo:", error);
-      Alert.alert("Error", "Failed to capture photo");
-    }
-  };
-
-  const captureCameraWithOverlay = async (): Promise<string | null> => {
-    try {
-      if (!cameraRef?.current) {
-        console.error("Camera ref not available");
-        return null;
-      }
-
-      const imageUri = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-        base64: false,
-        skipProcessing: false,
-      });
-
-      if (!imageUri) {
-        console.error("Failed to capture camera image");
-        return null;
-      }
-
-      const overlayUri = await createMeasurementOverlay();
-
-      if (overlayUri) {
-        const finalImageUri = await combineImages(imageUri.uri, overlayUri);
-        return finalImageUri;
-      }
-
-      return imageUri.uri;
-    } catch (error) {
-      console.error("Error capturing camera with overlay:", error);
-      return null;
-    }
-  };
-
-  const createMeasurementOverlay = async (): Promise<string | null> => {
-    try {
-      const { sensorData } = useSensors();
-      const { settings } = useSettings();
-
-      const measurementText = `iLaser Measurement Report
-========================
-Mode: ${mode.toUpperCase()}
-Angle: ${sensorData.angle.toFixed(settings.precision)}°
-Pitch: ${sensorData.pitch.toFixed(settings.precision)}°
-Roll: ${sensorData.roll.toFixed(settings.precision)}°
-Status: ${Math.abs(sensorData.angle) < 0.5 ? "LEVEL" : "NOT LEVEL"}
-Timestamp: ${new Date().toLocaleString()}
-Units: ${settings.unit}
-Precision: ${settings.precision} decimal places`;
-
-      return null;
-    } catch (error) {
-      console.error("Error creating measurement overlay:", error);
-      return null;
-    }
-  };
-
-  const combineImages = async (
-    cameraImageUri: string,
-    overlayUri: string
-  ): Promise<string | null> => {
-    try {
-      return cameraImageUri;
-    } catch (error) {
-      console.error("Error combining images:", error);
-      return null;
-    }
-  };
 
   const handleCalibration = () => {
     if (isCalibrating) {
@@ -313,13 +209,6 @@ Precision: ${settings.precision} decimal places`;
               size={20}
               color={isCalibrating ? "#000" : "#FFFFFF"}
             />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.controlButton}
-            onPress={handleCapture}
-          >
-            <Ionicons name="camera" size={20} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
 
