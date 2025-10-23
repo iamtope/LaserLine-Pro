@@ -472,12 +472,10 @@ export const SensorProvider: React.FC<SensorProviderProps> = ({ children }) => {
   }, [permissionsRequested.location]);
 
   const calibrate = () => {
-    
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
   const resetCalibration = () => {
-    
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
   };
 
