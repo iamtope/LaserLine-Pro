@@ -20,6 +20,7 @@ import {
   PrecisionType,
 } from "../context/SettingsContext";
 import { useRuler } from "../context/RulerContext";
+import { SUPPORT_EMAIL } from "../config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -166,7 +167,11 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
             <TouchableOpacity
               style={styles.supportButton}
               onPress={async () => {
-                const email = "adamoabasstope@gmail.com";
+                const email = SUPPORT_EMAIL;
+                if (!email) {
+                  Alert.alert("Support", "Support contact is not configured.");
+                  return;
+                }
                 const subject = "Laserline Pro Support";
                 const body = "Hi,\n\nI need help with Laserline Pro.\n\n";
                 const url = `mailto:${email}?subject=${encodeURIComponent(

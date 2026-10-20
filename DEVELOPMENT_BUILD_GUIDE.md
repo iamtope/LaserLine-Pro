@@ -118,8 +118,8 @@ npx expo start --dev-client
     [
       "react-native-google-mobile-ads",
       {
-        "androidAppId": "ca-app-pub-6244419407881612~4333756041",
-        "iosAppId": "ca-app-pub-6244419407881612~6898094220"
+        "androidAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~ANDROID_APP_ID",
+        "iosAppId": "ca-app-pub-XXXXXXXXXXXXXXXX~IOS_APP_ID"
       }
     ]
   ]
