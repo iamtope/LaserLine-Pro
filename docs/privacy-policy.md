@@ -19,7 +19,7 @@
 - No other third-party data collection
 
 ## Contact
-For questions about this privacy policy, contact: support@laserlinepro.com
+For questions about this privacy policy, open an issue on the project repository.
 
 ## Changes
 We may update this privacy policy. Changes will be posted on this page.

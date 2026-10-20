@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.iamtope.LaserlinePro",
+      "bundleIdentifier": "com.example.laserlinepro",
       "deploymentTarget": "16.0",
       "infoPlist": {
         "NSCameraUsageDescription": "This app needs camera access to provide laser leveling functionality."
@@ -36,7 +36,7 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.READ_EXTERNAL_STORAGE"
       ],
-      "package": "com.iamtope.LaserlinePro"
+      "package": "com.example.laserlinepro"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -49,12 +49,6 @@
         }
       ],
       "expo-font"
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "2fdc820b-4086-4245-8b0e-3567f3eebbfb"
-      }
-    },
-    "owner": "iamtope"
+    ]
   }
 }

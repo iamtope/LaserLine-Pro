@@ -10,6 +10,7 @@ import {
   Linking,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { DONATION_URL } from "../config";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,10 +25,8 @@ export const PremiumModal: React.FC<CoffeeModalProps> = ({
 }) => {
   const handleBuyCoffee = async () => {
     try {
-      const coffeeUrl = "https://ko-fi.com/iamtope"; // Replace with your actual Ko-fi, PayPal, or other donation link
-      const supported = await Linking.canOpenURL(coffeeUrl);
-      if (supported) {
-        await Linking.openURL(coffeeUrl);
+      if (DONATION_URL && (await Linking.canOpenURL(DONATION_URL))) {
+        await Linking.openURL(DONATION_URL);
       }
     } catch (error) {}
     onClose();

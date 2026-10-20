@@ -81,3 +81,9 @@ yarn-error.*
 *.tsbuildinfo
 
 # @end expo-cli
+# IDE
+.idea/
+.vscode/
+
+# env files
+.env
